@@ -24,7 +24,6 @@ class NewsSerializer(serializers.ModelSerializer):
         model = News
         fields = [
             'id', 'title', 'slug', 'description', 'photo', 'photo_url',
-            'video_url', 'video_embed',
             'is_pinned', 'is_event', 'date', 'photos', 'created_at', 'updated_at'
         ]
 
