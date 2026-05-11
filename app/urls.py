@@ -11,10 +11,12 @@ from .views import (
     QualityManagementViewSet, QualityManagementFileViewSet, BulletinViewSet,
     BulletinFileViewSet, BudgetProgramViewSet, HonoraryProfessorViewSet,
     InternationalCooperationViewSet, InternationalCooperationLinkViewSet,
-    AcademicHonestyViewSet, LegalDocumentViewSet, ScheduleViewSet, SurveyViewSet
+    AcademicHonestyViewSet, LegalDocumentViewSet, ScheduleViewSet, SurveyViewSet,
+    SiteSettingsViewSet
 )
 
 router = DefaultRouter()
+router.register(r'site-settings', SiteSettingsViewSet, basename='sitesettings')
 router.register(r'main-page', MainPageViewSet, basename='mainpage')
 router.register(r'news', NewsViewSet, basename='news')
 router.register(r'news-photos', NewsPhotoViewSet, basename='newsphoto')

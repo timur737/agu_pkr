@@ -10,7 +10,7 @@ from .models import (
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
     TradeUnion, QualityManagement, QualityManagementFile, Bulletin, BulletinFile,
     BudgetProgram, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
-    AcademicHonesty, LegalDocument, Schedule, Survey
+    AcademicHonesty, LegalDocument, Schedule, Survey, SiteSettings
 )
 from .serializers import (
     MainPageSerializer, NewsSerializer, NewsPhotoSerializer, AnnouncementSerializer,
@@ -23,7 +23,8 @@ from .serializers import (
     QualityManagementSerializer, QualityManagementFileSerializer, BulletinSerializer,
     BulletinFileSerializer, BudgetProgramSerializer, HonoraryProfessorSerializer,
     InternationalCooperationSerializer, InternationalCooperationLinkSerializer,
-    AcademicHonestySerializer, LegalDocumentSerializer, ScheduleSerializer, SurveySerializer
+    AcademicHonestySerializer, LegalDocumentSerializer, ScheduleSerializer, SurveySerializer,
+    SiteSettingsSerializer
 )
 
 
@@ -384,3 +385,11 @@ class SurveyViewSet(LanguageMixin, viewsets.ModelViewSet):
     serializer_class = SurveySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['title', 'description']
+
+class SiteSettingsViewSet(LanguageMixin, viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet for SiteSettings. Provides only read access to the frontend.
+    Returns a single object or empty list.
+    """
+    queryset = SiteSettings.objects.filter(is_active=True)
+    serializer_class = SiteSettingsSerializer

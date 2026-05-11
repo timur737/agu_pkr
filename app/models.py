@@ -204,6 +204,8 @@ class SocialLink(BaseModel):
     name = models.CharField(max_length=100, verbose_name="Название")
     url = models.URLField(verbose_name="Ссылка")
     icon = models.CharField(max_length=50, blank=True, verbose_name="Иконка")
+    show_in_header = models.BooleanField(default=True, verbose_name="Показывать в шапке")
+    show_in_footer = models.BooleanField(default=True, verbose_name="Показывать в подвале")
     order = models.IntegerField(default=0, verbose_name="Порядок")
 
     class Meta:
@@ -545,3 +547,18 @@ class Survey(BaseModel):
 
     def __str__(self):
         return self.title
+
+
+class SiteSettings(BaseModel):
+    """Site settings"""
+    news_title = models.CharField(max_length=200, default="Новости", verbose_name="Заголовок новостей")
+    announcements_title = models.CharField(max_length=200, default="Объявления", verbose_name="Заголовок объявлений")
+    library_title = models.CharField(max_length=200, default="Электронная библиотека", verbose_name="Заголовок библиотеки")
+    library_link = models.URLField(blank=True, verbose_name="Ссылка на библиотеку (внешняя)")
+
+    class Meta:
+        verbose_name = "Настройки сайта"
+        verbose_name_plural = "Настройки сайта"
+
+    def __str__(self):
+        return "Настройки сайта"

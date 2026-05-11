@@ -6,7 +6,7 @@ from .models import (
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
     TradeUnion, QualityManagement, QualityManagementFile, Bulletin, BulletinFile,
     BudgetProgram, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
-    AcademicHonesty, LegalDocument, Schedule, Survey
+    AcademicHonesty, LegalDocument, Schedule, Survey, SiteSettings
 )
 
 
@@ -24,6 +24,7 @@ class NewsSerializer(serializers.ModelSerializer):
         model = News
         fields = [
             'id', 'title', 'slug', 'description', 'photo', 'photo_url',
+            'video_url', 'video_embed',
             'is_pinned', 'is_event', 'date', 'photos', 'created_at', 'updated_at'
         ]
 
@@ -514,3 +515,8 @@ class SurveySerializer(serializers.ModelSerializer):
         model = Survey
         fields = ['id', 'title', 'description', 'link', 'created_at', 'updated_at']
 
+
+class SiteSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteSettings
+        fields = ['id', 'news_title', 'announcements_title', 'library_title', 'library_link', 'created_at', 'updated_at']

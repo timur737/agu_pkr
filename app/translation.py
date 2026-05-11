@@ -6,7 +6,7 @@ from .models import (
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
     TradeUnion, QualityManagement, QualityManagementFile, Bulletin, BulletinFile,
     BudgetProgram, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
-    AcademicHonesty, LegalDocument, Schedule, Survey
+    AcademicHonesty, LegalDocument, Schedule, Survey, SiteSettings
 )
 
 
@@ -173,4 +173,9 @@ class ScheduleTranslationOptions(TranslationOptions):
 @register(Survey)
 class SurveyTranslationOptions(TranslationOptions):
     fields = ('title', 'description')
+
+
+@register(SiteSettings)
+class SiteSettingsTranslationOptions(TranslationOptions):
+    fields = ('news_title', 'announcements_title', 'library_title')
 

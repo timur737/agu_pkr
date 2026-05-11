@@ -193,12 +193,12 @@ class ContactDepartmentAdmin(TabbedTranslationAdmin):
 
 @admin.register(SocialLink)
 class SocialLinkAdmin(TabbedTranslationAdmin):
-    list_display = ('name', 'url', 'order', 'is_active', 'created_at')
-    list_filter = ('is_active', 'created_at')
+    list_display = ('name', 'url', 'show_in_header', 'show_in_footer', 'order', 'is_active', 'created_at')
+    list_filter = ('is_active', 'show_in_header', 'show_in_footer', 'created_at')
     search_fields = ('name', 'url')
     fieldsets = (
         ('Основное', {
-            'fields': ('name', 'url', 'icon', 'order', 'is_active')
+            'fields': ('name', 'url', 'icon', 'show_in_header', 'show_in_footer', 'order', 'is_active')
         }),
     )
 
@@ -456,3 +456,12 @@ class SurveyAdmin(TabbedTranslationAdmin):
             'fields': ('title', 'description', 'link', 'is_active')
         }),
     )
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(TabbedTranslationAdmin):
+    list_display = ('__str__', 'news_title', 'announcements_title', 'library_title', 'is_active')
+    
+    def has_add_permission(self, request):
+        if self.model.objects.exists():
+            return False
+        return super().has_add_permission(request)
