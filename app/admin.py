@@ -8,7 +8,7 @@ from .models import (
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
     TradeUnion, QualityManagement, QualityManagementFile, Bulletin, BulletinFile,
     BudgetProgram, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
-    AcademicHonesty, LegalDocument, Schedule, Survey
+    AcademicHonesty, LegalDocument, Schedule, Survey, SiteSettings
 )
 
 

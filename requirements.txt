@@ -4,8 +4,7 @@ django-jazzmin>=3.0.1
 Pillow==11.0.0
 django-cors-headers==4.4.0
 django-filter==24.3
-drf-yasg==1.21.7
+drf-yasg>=1.21.8
 django-modeltranslation==0.18.12
 setuptools>=65.5.0
 python-decouple==3.8
-

@@ -1,0 +1,7 @@
+# Python cache
+*.pyc
+__pycache__/
+
+# Virtual environment and specific files
+venv/
+GEMINI.md
