@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from corsheaders.defaults import default_headers
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -165,6 +167,7 @@ REST_FRAMEWORK = {
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True  # Change this in production
+CORS_ALLOW_HEADERS = (*default_headers, 'language', 'x-language')
 
 # Swagger settings
 SWAGGER_SETTINGS = {
