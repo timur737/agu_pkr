@@ -77,6 +77,7 @@ class NewsAdmin(TabbedTranslationAdmin):
     list_filter = ('is_pinned', 'is_event', 'is_active', 'date')
     search_fields = ('title', 'description', 'title_ru', 'title_ky', 'title_en')
     prepopulated_fields = {'slug': ('title_ru',)}  # Используем русский язык для slug
+    readonly_fields = ('date',)
     inlines = [NewsPhotoInline]
     fieldsets = (
         ('Основное', {
@@ -100,6 +101,7 @@ class AnnouncementAdmin(TabbedTranslationAdmin):
     list_display = ('title', 'is_pinned', 'date', 'is_active', 'created_at')
     list_filter = ('is_pinned', 'is_active', 'date')
     search_fields = ('title', 'description', 'title_ru', 'title_ky', 'title_en', 'description_ru', 'description_ky', 'description_en')
+    readonly_fields = ('date',)
     fieldsets = (
         ('Основное', {
             'fields': ('title', 'description', 'is_active')
