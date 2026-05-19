@@ -177,6 +177,11 @@ class SocialLinkViewSet(LanguageMixin, viewsets.ModelViewSet):
     ordering_fields = ['order']
     ordering = ['order']
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
 
 class AboutAcademyViewSet(LanguageMixin, viewsets.ModelViewSet):
     queryset = AboutAcademy.objects.filter(is_active=True)

@@ -203,7 +203,7 @@ class SocialLink(BaseModel):
     """Social media links"""
     name = models.CharField(max_length=100, verbose_name="Название")
     url = models.URLField(verbose_name="Ссылка")
-    icon = models.CharField(max_length=50, blank=True, verbose_name="Иконка")
+    icon = models.ImageField(upload_to='social_icons/', blank=True, null=True, verbose_name="Иконка")
     show_in_header = models.BooleanField(default=True, verbose_name="Показывать в шапке")
     show_in_footer = models.BooleanField(default=True, verbose_name="Показывать в подвале")
     order = models.IntegerField(default=0, verbose_name="Порядок")

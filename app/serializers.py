@@ -156,9 +156,19 @@ class ContactSerializer(serializers.ModelSerializer):
 
 
 class SocialLinkSerializer(serializers.ModelSerializer):
+    icon_url = serializers.SerializerMethodField()
+
     class Meta:
         model = SocialLink
-        fields = ['id', 'name', 'url', 'icon', 'order', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'url', 'icon', 'icon_url', 'order', 'created_at', 'updated_at']
+
+    def get_icon_url(self, obj):
+        if obj.icon:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.icon.url)
+            return obj.icon.url
+        return None
 
 
 class MainPageSerializer(serializers.ModelSerializer):
