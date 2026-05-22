@@ -16,6 +16,7 @@
 ### Главная страница
 - `GET /api/main-page/` - Получить главную страницу
 - `GET /api/main-page/{id}/` - Детали главной страницы
+- `GET /api/mainpageslider/` - Слайдер главной страницы
 
 ### Новости и события
 - `GET /api/news/` - Список новостей
@@ -97,4 +98,3 @@
 - ReDoc: `/redoc/` - Альтернативный стиль документации
 - JSON Schema: `/swagger.json` - Схема API в формате JSON
 - YAML Schema: `/swagger.yaml` - Схема API в формате YAML
-

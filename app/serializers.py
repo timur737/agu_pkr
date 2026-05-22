@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    MainPage, News, NewsPhoto, Announcement, EducationProgram, EducationDirection,
+    MainPage, MainPageSlider, News, NewsPhoto, Announcement, EducationProgram, EducationDirection,
     LibraryCategory, LibraryResource, Contact, ContactDepartment, SocialLink,
     AboutAcademy, Partner, AcademyCharter, AcademyHistory, AcademyLogo,
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
@@ -8,6 +8,12 @@ from .models import (
     BudgetProgram, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
     AcademicHonesty, LegalDocument, Schedule, Survey, SiteSettings
 )
+
+
+class MainPageSliderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MainPageSlider
+        fields = ['date', 'title', 'img']
 
 
 class NewsPhotoSerializer(serializers.ModelSerializer):

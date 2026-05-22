@@ -1,6 +1,6 @@
 from modeltranslation.translator import register, TranslationOptions
 from .models import (
-    MainPage, News, Announcement, EducationProgram, EducationDirection,
+    MainPage, MainPageSlider, News, Announcement, EducationProgram, EducationDirection,
     LibraryCategory, LibraryResource, Contact, ContactDepartment, SocialLink,
     AboutAcademy, Partner, AcademyCharter, AcademyHistory, AcademyLogo,
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
@@ -13,6 +13,11 @@ from .models import (
 @register(MainPage)
 class MainPageTranslationOptions(TranslationOptions):
     fields = ('about_title', 'about_description', 'about_link')
+
+
+@register(MainPageSlider)
+class MainPageSliderTranslationOptions(TranslationOptions):
+    fields = ('title',)
 
 
 @register(News)
@@ -178,4 +183,3 @@ class SurveyTranslationOptions(TranslationOptions):
 @register(SiteSettings)
 class SiteSettingsTranslationOptions(TranslationOptions):
     fields = ('news_title', 'announcements_title', 'library_title')
-

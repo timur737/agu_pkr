@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInline
 from .models import (
-    MainPage, News, NewsPhoto, Announcement, EducationProgram, EducationDirection,
+    MainPage, MainPageSlider, News, NewsPhoto, Announcement, EducationProgram, EducationDirection,
     LibraryCategory, LibraryResource, Contact, ContactDepartment, SocialLink,
     AboutAcademy, Partner, AcademyCharter, AcademyHistory, AcademyLogo,
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
@@ -67,6 +67,18 @@ class MainPageAdmin(TabbedTranslationAdmin):
         }),
         ('Об Академии', {
             'fields': ('about_title', 'about_description', 'about_link')
+        }),
+    )
+
+
+@admin.register(MainPageSlider)
+class MainPageSliderAdmin(TabbedTranslationAdmin):
+    list_display = ('title', 'date', 'is_active', 'created_at')
+    list_filter = ('is_active', 'date', 'created_at')
+    search_fields = ('title', 'title_ru', 'title_ky', 'title_en')
+    fieldsets = (
+        ('Основное', {
+            'fields': ('date', 'title', 'img', 'is_active')
         }),
     )
 

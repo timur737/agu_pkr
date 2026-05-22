@@ -1,8 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
-    MainPageViewSet, NewsViewSet, NewsPhotoViewSet, AnnouncementViewSet,
-    EducationProgramViewSet, EducationDirectionViewSet,
+    MainPageViewSet, MainPageSliderViewSet, NewsViewSet, NewsPhotoViewSet,
+    AnnouncementViewSet, EducationProgramViewSet, EducationDirectionViewSet,
     LibraryCategoryViewSet, LibraryResourceViewSet, ContactViewSet,
     ContactDepartmentViewSet, SocialLinkViewSet, AboutAcademyViewSet,
     PartnerViewSet, AcademyCharterViewSet, AcademyHistoryViewSet,
@@ -18,6 +18,7 @@ from .views import (
 router = DefaultRouter()
 router.register(r'site-settings', SiteSettingsViewSet, basename='sitesettings')
 router.register(r'main-page', MainPageViewSet, basename='mainpage')
+router.register(r'mainpageslider', MainPageSliderViewSet, basename='mainpageslider')
 router.register(r'news', NewsViewSet, basename='news')
 router.register(r'news-photos', NewsPhotoViewSet, basename='newsphoto')
 router.register(r'announcements', AnnouncementViewSet, basename='announcement')
@@ -54,4 +55,3 @@ router.register(r'surveys', SurveyViewSet, basename='survey')
 urlpatterns = [
     path('', include(router.urls)),
 ]
-

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .mixins import LanguageMixin
 from .models import (
-    MainPage, News, NewsPhoto, Announcement, EducationProgram, EducationDirection,
+    MainPage, MainPageSlider, News, NewsPhoto, Announcement, EducationProgram, EducationDirection,
     LibraryCategory, LibraryResource, Contact, ContactDepartment, SocialLink,
     AboutAcademy, Partner, AcademyCharter, AcademyHistory, AcademyLogo,
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
@@ -13,8 +13,8 @@ from .models import (
     AcademicHonesty, LegalDocument, Schedule, Survey, SiteSettings
 )
 from .serializers import (
-    MainPageSerializer, NewsSerializer, NewsPhotoSerializer, AnnouncementSerializer,
-    EducationProgramSerializer, EducationDirectionSerializer,
+    MainPageSerializer, MainPageSliderSerializer, NewsSerializer, NewsPhotoSerializer,
+    AnnouncementSerializer, EducationProgramSerializer, EducationDirectionSerializer,
     LibraryCategorySerializer, LibraryResourceSerializer, ContactSerializer,
     ContactDepartmentSerializer, SocialLinkSerializer, AboutAcademySerializer,
     PartnerSerializer, AcademyCharterSerializer, AcademyHistorySerializer,
@@ -26,6 +26,20 @@ from .serializers import (
     AcademicHonestySerializer, LegalDocumentSerializer, ScheduleSerializer, SurveySerializer,
     SiteSettingsSerializer
 )
+
+
+class MainPageSliderViewSet(LanguageMixin, viewsets.ReadOnlyModelViewSet):
+    queryset = MainPageSlider.objects.filter(is_active=True)
+    serializer_class = MainPageSliderSerializer
+    pagination_class = None
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['date', 'created_at']
+    ordering = ['-date']
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
 
 
 class MainPageViewSet(LanguageMixin, viewsets.ModelViewSet):

@@ -28,6 +28,21 @@ class MainPage(BaseModel):
         return "Главная страница"
 
 
+class MainPageSlider(BaseModel):
+    """Main page slider item"""
+    date = models.DateField(verbose_name="Дата")
+    title = models.CharField(max_length=200, verbose_name="Заголовок")
+    img = models.ImageField(upload_to='main_page_slider/', verbose_name="Изображение")
+
+    class Meta:
+        verbose_name = "Слайд главной страницы"
+        verbose_name_plural = "Слайдер главной страницы"
+        ordering = ['-date']
+
+    def __str__(self):
+        return self.title
+
+
 class News(BaseModel):
     """News model"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
