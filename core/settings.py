@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['91.213.233.195', 'localhost', '127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['http://91.213.233.195']
+CSRF_TRUSTED_ORIGINS = ['http://91.213.233.195', 'https://91.213.233.195']
 
 
 # Application definition
@@ -150,6 +150,8 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -219,7 +221,11 @@ JAZZMIN_SETTINGS = {
     "show_sidebar": True,
     "navigation_expanded": True,
     "hide_apps": [],
-    "hide_models": [],
+    "hide_models": [
+        "app.ContactDepartment",
+        "app.EducationDirection",
+        "app.InternationalCooperationLink",
+    ],
     "order_with_respect_to": ["app", "auth"],
     "custom_links": {
         "app": [{

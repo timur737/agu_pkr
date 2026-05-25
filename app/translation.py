@@ -2,10 +2,10 @@ from modeltranslation.translator import register, TranslationOptions
 from .models import (
     MainPage, MainPageSlider, News, Announcement, EducationProgram, EducationDirection,
     LibraryCategory, LibraryResource, Contact, ContactDepartment, SocialLink,
-    AboutAcademy, Partner, AcademyCharter, AcademyHistory, AcademyLogo,
+    AboutAcademy, Partner, AcademyCharter, AcademyCharterLink, AcademyHistory, AcademyLogo,
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
-    TradeUnion, QualityManagement, QualityManagementFile, Bulletin, BulletinFile,
-    BudgetProgram, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
+    TradeUnion, TradeUnionLink, QualityManagement, QualityManagementFile, Bulletin, BulletinFile,
+    BulletinLink, BudgetProgram, BudgetProgramLink, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
     AcademicHonesty, LegalDocument, Schedule, Survey, SiteSettings
 )
 
@@ -85,6 +85,11 @@ class AcademyCharterTranslationOptions(TranslationOptions):
     fields = ('title', 'description')
 
 
+@register(AcademyCharterLink)
+class AcademyCharterLinkTranslationOptions(TranslationOptions):
+    fields = ('title',)
+
+
 @register(AcademyHistory)
 class AcademyHistoryTranslationOptions(TranslationOptions):
     fields = ('title', 'description')
@@ -120,6 +125,11 @@ class TradeUnionTranslationOptions(TranslationOptions):
     fields = ('title', 'description')
 
 
+@register(TradeUnionLink)
+class TradeUnionLinkTranslationOptions(TranslationOptions):
+    fields = ('title',)
+
+
 @register(QualityManagement)
 class QualityManagementTranslationOptions(TranslationOptions):
     fields = ('title',)
@@ -135,6 +145,11 @@ class BulletinTranslationOptions(TranslationOptions):
     fields = ('title', 'description')
 
 
+@register(BulletinLink)
+class BulletinLinkTranslationOptions(TranslationOptions):
+    fields = ('title',)
+
+
 @register(BulletinFile)
 class BulletinFileTranslationOptions(TranslationOptions):
     fields = ('title',)
@@ -143,6 +158,11 @@ class BulletinFileTranslationOptions(TranslationOptions):
 @register(BudgetProgram)
 class BudgetProgramTranslationOptions(TranslationOptions):
     fields = ('title', 'description', 'period')
+
+
+@register(BudgetProgramLink)
+class BudgetProgramLinkTranslationOptions(TranslationOptions):
+    fields = ('title',)
 
 
 @register(HonoraryProfessor)

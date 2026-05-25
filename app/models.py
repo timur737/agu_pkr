@@ -1,6 +1,22 @@
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.text import slugify
+
+
+def normalize_link(value):
+    if not value:
+        return value
+
+    value = value.strip()
+    if not value or value.startswith(('/', '#')):
+        return value
+
+    first_part = value.split('/', 1)[0]
+    if ':' in first_part and first_part.split(':', 1)[0].lower() in {'http', 'https', 'mailto', 'tel', 'ftp', 'ftps'}:
+        return value
+
+    return f"https://{value}"
 
 
 class BaseModel(models.Model):
@@ -18,7 +34,7 @@ class MainPage(BaseModel):
     main_photo = models.ImageField(upload_to='main_page/', blank=True, null=True, verbose_name="Главное фото")
     about_title = models.CharField(max_length=200, blank=True, verbose_name="Заголовок об академии")
     about_description = models.TextField(blank=True, verbose_name="Описание об академии")
-    about_link = models.CharField(max_length=200, blank=True, verbose_name="Ссылка об академии")
+    about_link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка об академии")
 
     class Meta:
         verbose_name = "Главная страница"
@@ -26,6 +42,10 @@ class MainPage(BaseModel):
 
     def __str__(self):
         return "Главная страница"
+
+    def save(self, *args, **kwargs):
+        self.about_link = normalize_link(self.about_link)
+        super().save(*args, **kwargs)
 
 
 class MainPageSlider(BaseModel):
@@ -85,7 +105,7 @@ class Announcement(BaseModel):
     title = models.CharField(max_length=200, verbose_name="Заголовок")
     description = models.TextField(verbose_name="Описание")
     is_pinned = models.BooleanField(default=False, verbose_name="Закреплено")
-    date = models.DateTimeField(auto_now_add=True, verbose_name="Дата")
+    date = models.DateTimeField(default=timezone.now, verbose_name="Дата")
 
     class Meta:
         verbose_name = "Объявление"
@@ -110,7 +130,7 @@ class EducationProgram(BaseModel):
     title = models.CharField(max_length=200, verbose_name="Название")
     program_type = models.CharField(max_length=20, choices=PROGRAM_TYPES, verbose_name="Тип программы")
     description = models.TextField(verbose_name="Описание")
-    link = models.URLField(blank=True, verbose_name="Ссылка")
+    link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
     photo = models.ImageField(upload_to='education/', blank=True, null=True, verbose_name="Фото")
     order = models.IntegerField(default=0, verbose_name="Порядок")
 
@@ -122,12 +142,16 @@ class EducationProgram(BaseModel):
     def __str__(self):
         return f"{self.get_program_type_display()} - {self.title}"
 
+    def save(self, *args, **kwargs):
+        self.link = normalize_link(self.link)
+        super().save(*args, **kwargs)
+
 
 class EducationDirection(BaseModel):
     """Education directions model"""
     title = models.CharField(max_length=200, verbose_name="Название")
     description = models.TextField(verbose_name="Описание")
-    link = models.URLField(blank=True, verbose_name="Ссылка")
+    link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
     photo = models.ImageField(upload_to='education/directions/', blank=True, null=True, verbose_name="Фото")
 
     class Meta:
@@ -136,6 +160,10 @@ class EducationDirection(BaseModel):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.link = normalize_link(self.link)
+        super().save(*args, **kwargs)
 
 
 class LibraryCategory(BaseModel):
@@ -164,7 +192,7 @@ class LibraryResource(BaseModel):
     title = models.CharField(max_length=200, verbose_name="Название")
     description = models.TextField(verbose_name="Описание")
     photo = models.ImageField(upload_to='library/', blank=True, null=True, verbose_name="Фото")
-    link = models.URLField(blank=True, verbose_name="Ссылка")
+    link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
     file = models.FileField(upload_to='library/files/', blank=True, null=True, verbose_name="Файл")
 
     class Meta:
@@ -173,6 +201,10 @@ class LibraryResource(BaseModel):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.link = normalize_link(self.link)
+        super().save(*args, **kwargs)
 
 
 class Contact(BaseModel):
@@ -183,7 +215,7 @@ class Contact(BaseModel):
     email = models.EmailField(blank=True, verbose_name="Email")
     phone = models.CharField(max_length=50, blank=True, verbose_name="Телефон")
     address = models.TextField(blank=True, verbose_name="Адрес")
-    map_url = models.URLField(blank=True, verbose_name="Ссылка на карту")
+    map_url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка на карту")
     map_embed = models.TextField(blank=True, verbose_name="Код карты (embed)")
 
     class Meta:
@@ -192,6 +224,10 @@ class Contact(BaseModel):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.map_url = normalize_link(self.map_url)
+        super().save(*args, **kwargs)
 
 
 class ContactDepartment(BaseModel):
@@ -217,7 +253,7 @@ class ContactDepartment(BaseModel):
 class SocialLink(BaseModel):
     """Social media links"""
     name = models.CharField(max_length=100, verbose_name="Название")
-    url = models.URLField(verbose_name="Ссылка")
+    url = models.CharField(max_length=500, verbose_name="Ссылка")
     icon = models.ImageField(upload_to='social_icons/', blank=True, null=True, verbose_name="Иконка")
     show_in_header = models.BooleanField(default=True, verbose_name="Показывать в шапке")
     show_in_footer = models.BooleanField(default=True, verbose_name="Показывать в подвале")
@@ -230,6 +266,10 @@ class SocialLink(BaseModel):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.url = normalize_link(self.url)
+        super().save(*args, **kwargs)
 
 
 class AboutAcademy(BaseModel):
@@ -258,7 +298,7 @@ class Partner(BaseModel):
     """Partners model"""
     name = models.CharField(max_length=200, verbose_name="Название")
     photo = models.ImageField(upload_to='partners/', verbose_name="Логотип")
-    url = models.URLField(blank=True, verbose_name="Ссылка")
+    url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
     order = models.IntegerField(default=0, verbose_name="Порядок")
 
     class Meta:
@@ -268,6 +308,10 @@ class Partner(BaseModel):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.url = normalize_link(self.url)
+        super().save(*args, **kwargs)
 
 
 class AcademyCharter(BaseModel):
@@ -282,6 +326,26 @@ class AcademyCharter(BaseModel):
 
     def __str__(self):
         return self.title
+
+
+class AcademyCharterLink(BaseModel):
+    """Academy Charter links"""
+    charter = models.ForeignKey(AcademyCharter, related_name='links', on_delete=models.CASCADE, verbose_name="Устав академии")
+    title = models.CharField(max_length=200, blank=True, verbose_name="Название")
+    url = models.CharField(max_length=500, verbose_name="Ссылка")
+    order = models.IntegerField(default=0, verbose_name="Порядок")
+
+    class Meta:
+        verbose_name = "Ссылка устава академии"
+        verbose_name_plural = "Ссылки устава академии"
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return self.title or self.url
+
+    def save(self, *args, **kwargs):
+        self.url = normalize_link(self.url)
+        super().save(*args, **kwargs)
 
 
 class AcademyHistory(BaseModel):
@@ -382,6 +446,26 @@ class TradeUnion(BaseModel):
         return self.title
 
 
+class TradeUnionLink(BaseModel):
+    """Trade Union Committee links"""
+    trade_union = models.ForeignKey(TradeUnion, related_name='links', on_delete=models.CASCADE, verbose_name="Профсоюзный комитет")
+    title = models.CharField(max_length=200, blank=True, verbose_name="Название")
+    url = models.CharField(max_length=500, verbose_name="Ссылка")
+    order = models.IntegerField(default=0, verbose_name="Порядок")
+
+    class Meta:
+        verbose_name = "Ссылка профсоюзного комитета"
+        verbose_name_plural = "Ссылки профсоюзного комитета"
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return self.title or self.url
+
+    def save(self, *args, **kwargs):
+        self.url = normalize_link(self.url)
+        super().save(*args, **kwargs)
+
+
 class QualityManagement(BaseModel):
     """Quality Management System"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
@@ -421,6 +505,26 @@ class Bulletin(BaseModel):
         return self.title
 
 
+class BulletinLink(BaseModel):
+    """Bulletin links"""
+    bulletin = models.ForeignKey(Bulletin, related_name='links', on_delete=models.CASCADE, verbose_name="Вестник")
+    title = models.CharField(max_length=200, blank=True, verbose_name="Название")
+    url = models.CharField(max_length=500, verbose_name="Ссылка")
+    order = models.IntegerField(default=0, verbose_name="Порядок")
+
+    class Meta:
+        verbose_name = "Ссылка вестника"
+        verbose_name_plural = "Ссылки вестника"
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return self.title or self.url
+
+    def save(self, *args, **kwargs):
+        self.url = normalize_link(self.url)
+        super().save(*args, **kwargs)
+
+
 class BulletinFile(BaseModel):
     """Bulletin Files"""
     bulletin = models.ForeignKey(Bulletin, related_name='files', on_delete=models.CASCADE, verbose_name="Вестник")
@@ -447,6 +551,26 @@ class BudgetProgram(BaseModel):
 
     def __str__(self):
         return self.title
+
+
+class BudgetProgramLink(BaseModel):
+    """Budget Program links"""
+    budget_program = models.ForeignKey(BudgetProgram, related_name='links', on_delete=models.CASCADE, verbose_name="Проект бюджетных программ")
+    title = models.CharField(max_length=200, blank=True, verbose_name="Название")
+    url = models.CharField(max_length=500, verbose_name="Ссылка")
+    order = models.IntegerField(default=0, verbose_name="Порядок")
+
+    class Meta:
+        verbose_name = "Ссылка проекта бюджетных программ"
+        verbose_name_plural = "Ссылки проекта бюджетных программ"
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return self.title or self.url
+
+    def save(self, *args, **kwargs):
+        self.url = normalize_link(self.url)
+        super().save(*args, **kwargs)
 
 
 class HonoraryProfessor(BaseModel):
@@ -483,7 +607,7 @@ class InternationalCooperationLink(BaseModel):
     """International Cooperation Links"""
     cooperation = models.ForeignKey(InternationalCooperation, related_name='links', on_delete=models.CASCADE, verbose_name="Международное сотрудничество")
     title = models.CharField(max_length=200, verbose_name="Название")
-    url = models.URLField(verbose_name="Ссылка")
+    url = models.CharField(max_length=500, verbose_name="Ссылка")
 
     class Meta:
         verbose_name = "Ссылка сотрудничества"
@@ -491,6 +615,10 @@ class InternationalCooperationLink(BaseModel):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.url = normalize_link(self.url)
+        super().save(*args, **kwargs)
 
 
 class AcademicHonesty(BaseModel):
@@ -554,7 +682,7 @@ class Survey(BaseModel):
     """Survey/Questionnaire model"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
     description = models.TextField(blank=True, verbose_name="Описание")
-    link = models.URLField(verbose_name="Ссылка")
+    link = models.CharField(max_length=500, verbose_name="Ссылка")
 
     class Meta:
         verbose_name = "Анкетирование"
@@ -563,13 +691,17 @@ class Survey(BaseModel):
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        self.link = normalize_link(self.link)
+        super().save(*args, **kwargs)
+
 
 class SiteSettings(BaseModel):
     """Site settings"""
     news_title = models.CharField(max_length=200, default="Новости", verbose_name="Заголовок новостей")
     announcements_title = models.CharField(max_length=200, default="Объявления", verbose_name="Заголовок объявлений")
     library_title = models.CharField(max_length=200, default="Электронная библиотека", verbose_name="Заголовок библиотеки")
-    library_link = models.URLField(blank=True, verbose_name="Ссылка на библиотеку (внешняя)")
+    library_link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка на библиотеку (внешняя)")
 
     class Meta:
         verbose_name = "Настройки сайта"
@@ -577,3 +709,7 @@ class SiteSettings(BaseModel):
 
     def __str__(self):
         return "Настройки сайта"
+
+    def save(self, *args, **kwargs):
+        self.library_link = normalize_link(self.library_link)
+        super().save(*args, **kwargs)

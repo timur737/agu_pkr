@@ -4,10 +4,10 @@ from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInl
 from .models import (
     MainPage, MainPageSlider, News, NewsPhoto, Announcement, EducationProgram, EducationDirection,
     LibraryCategory, LibraryResource, Contact, ContactDepartment, SocialLink,
-    AboutAcademy, Partner, AcademyCharter, AcademyHistory, AcademyLogo,
+    AboutAcademy, Partner, AcademyCharter, AcademyCharterLink, AcademyHistory, AcademyLogo,
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
-    TradeUnion, QualityManagement, QualityManagementFile, Bulletin, BulletinFile,
-    BudgetProgram, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
+    TradeUnion, TradeUnionLink, QualityManagement, QualityManagementFile, Bulletin, BulletinFile,
+    BulletinLink, BudgetProgram, BudgetProgramLink, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
     AcademicHonesty, LegalDocument, Schedule, Survey, SiteSettings
 )
 
@@ -15,7 +15,7 @@ from .models import (
 # Inline Admin Classes
 class NewsPhotoInline(admin.TabularInline):
     model = NewsPhoto
-    extra = 1
+    extra = 3
     fields = ('photo', 'is_active')
 
 
@@ -47,6 +47,30 @@ class BulletinFileInline(TranslationTabularInline):
     model = BulletinFile
     extra = 1
     fields = ('title', 'file', 'is_active')
+
+
+class BulletinLinkInline(TranslationTabularInline):
+    model = BulletinLink
+    extra = 2
+    fields = ('title', 'url', 'order', 'is_active')
+
+
+class BudgetProgramLinkInline(TranslationTabularInline):
+    model = BudgetProgramLink
+    extra = 2
+    fields = ('title', 'url', 'order', 'is_active')
+
+
+class TradeUnionLinkInline(TranslationTabularInline):
+    model = TradeUnionLink
+    extra = 2
+    fields = ('title', 'url', 'order', 'is_active')
+
+
+class AcademyCharterLinkInline(TranslationTabularInline):
+    model = AcademyCharterLink
+    extra = 2
+    fields = ('title', 'url', 'order', 'is_active')
 
 
 class InternationalCooperationLinkInline(TranslationTabularInline):
@@ -113,7 +137,6 @@ class AnnouncementAdmin(TabbedTranslationAdmin):
     list_display = ('title', 'is_pinned', 'date', 'is_active', 'created_at')
     list_filter = ('is_pinned', 'is_active', 'date')
     search_fields = ('title', 'description', 'title_ru', 'title_ky', 'title_en', 'description_ru', 'description_ky', 'description_en')
-    readonly_fields = ('date',)
     fieldsets = (
         ('Основное', {
             'fields': ('title', 'description', 'is_active')
@@ -257,6 +280,7 @@ class AcademyCharterAdmin(TabbedTranslationAdmin):
     list_display = ('title', 'is_active', 'created_at')
     list_filter = ('is_active', 'created_at')
     search_fields = ('title', 'description', 'title_ru', 'title_ky', 'title_en', 'description_ru', 'description_ky', 'description_en')
+    inlines = [AcademyCharterLinkInline]
     fieldsets = (
         ('Основное', {
             'fields': ('title', 'description', 'file', 'is_active')
@@ -333,6 +357,7 @@ class TradeUnionAdmin(TabbedTranslationAdmin):
     list_display = ('title', 'is_active', 'created_at')
     list_filter = ('is_active', 'created_at')
     search_fields = ('title', 'description', 'title_ru', 'title_ky', 'title_en', 'description_ru', 'description_ky', 'description_en')
+    inlines = [TradeUnionLinkInline]
     fieldsets = (
         ('Основное', {
             'fields': ('title', 'description', 'is_active')
@@ -365,7 +390,7 @@ class BulletinAdmin(TabbedTranslationAdmin):
     list_display = ('title', 'is_active', 'created_at')
     list_filter = ('is_active', 'created_at')
     search_fields = ('title', 'description', 'title_ru', 'title_ky', 'title_en', 'description_ru', 'description_ky', 'description_en')
-    inlines = [BulletinFileInline]
+    inlines = [BulletinLinkInline, BulletinFileInline]
     fieldsets = (
         ('Основное', {
             'fields': ('title', 'description', 'is_active')
@@ -385,6 +410,7 @@ class BudgetProgramAdmin(TabbedTranslationAdmin):
     list_display = ('title', 'period', 'is_active', 'created_at')
     list_filter = ('is_active', 'created_at')
     search_fields = ('title', 'description', 'period')
+    inlines = [BudgetProgramLinkInline]
     fieldsets = (
         ('Основное', {
             'fields': ('title', 'description', 'period', 'is_active')
@@ -473,7 +499,12 @@ class SurveyAdmin(TabbedTranslationAdmin):
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(TabbedTranslationAdmin):
-    list_display = ('__str__', 'news_title', 'announcements_title', 'library_title', 'is_active')
+    list_display = ('__str__', 'news_title', 'announcements_title', 'library_title')
+    fieldsets = (
+        ('Основное', {
+            'fields': ('news_title', 'announcements_title', 'library_title', 'library_link')
+        }),
+    )
     
     def has_add_permission(self, request):
         if self.model.objects.exists():

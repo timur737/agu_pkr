@@ -2,10 +2,10 @@ from rest_framework import serializers
 from .models import (
     MainPage, MainPageSlider, News, NewsPhoto, Announcement, EducationProgram, EducationDirection,
     LibraryCategory, LibraryResource, Contact, ContactDepartment, SocialLink,
-    AboutAcademy, Partner, AcademyCharter, AcademyHistory, AcademyLogo,
+    AboutAcademy, Partner, AcademyCharter, AcademyCharterLink, AcademyHistory, AcademyLogo,
     OrganizationalStructure, Department, AcademicCouncil, AcademicCouncilFile,
-    TradeUnion, QualityManagement, QualityManagementFile, Bulletin, BulletinFile,
-    BudgetProgram, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
+    TradeUnion, TradeUnionLink, QualityManagement, QualityManagementFile, Bulletin, BulletinFile,
+    BulletinLink, BudgetProgram, BudgetProgramLink, HonoraryProfessor, InternationalCooperation, InternationalCooperationLink,
     AcademicHonesty, LegalDocument, Schedule, Survey, SiteSettings
 )
 
@@ -265,10 +265,11 @@ class AboutAcademySerializer(serializers.ModelSerializer):
 
 class AcademyCharterSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
+    links = serializers.SerializerMethodField()
 
     class Meta:
         model = AcademyCharter
-        fields = ['id', 'title', 'description', 'file', 'file_url', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'description', 'file', 'file_url', 'links', 'created_at', 'updated_at']
 
     def get_file_url(self, obj):
         if obj.file:
@@ -277,6 +278,16 @@ class AcademyCharterSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(obj.file.url)
             return obj.file.url
         return None
+
+    def get_links(self, obj):
+        links = obj.links.filter(is_active=True)
+        return AcademyCharterLinkSerializer(links, many=True).data
+
+
+class AcademyCharterLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AcademyCharterLink
+        fields = ['id', 'title', 'url', 'order', 'created_at', 'updated_at']
 
 
 class AcademyHistorySerializer(serializers.ModelSerializer):
@@ -362,9 +373,21 @@ class AcademicCouncilSerializer(serializers.ModelSerializer):
 
 
 class TradeUnionSerializer(serializers.ModelSerializer):
+    links = serializers.SerializerMethodField()
+
     class Meta:
         model = TradeUnion
-        fields = ['id', 'title', 'description', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'description', 'links', 'created_at', 'updated_at']
+
+    def get_links(self, obj):
+        links = obj.links.filter(is_active=True)
+        return TradeUnionLinkSerializer(links, many=True).data
+
+
+class TradeUnionLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TradeUnionLink
+        fields = ['id', 'title', 'url', 'order', 'created_at', 'updated_at']
 
 
 class QualityManagementFileSerializer(serializers.ModelSerializer):
@@ -407,18 +430,41 @@ class BulletinFileSerializer(serializers.ModelSerializer):
         return None
 
 
+class BulletinLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BulletinLink
+        fields = ['id', 'title', 'url', 'order', 'created_at', 'updated_at']
+
+
 class BulletinSerializer(serializers.ModelSerializer):
     files = BulletinFileSerializer(many=True, read_only=True)
+    links = serializers.SerializerMethodField()
 
     class Meta:
         model = Bulletin
-        fields = ['id', 'title', 'description', 'files', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'description', 'links', 'files', 'created_at', 'updated_at']
+
+    def get_links(self, obj):
+        links = obj.links.filter(is_active=True)
+        return BulletinLinkSerializer(links, many=True).data
 
 
 class BudgetProgramSerializer(serializers.ModelSerializer):
+    links = serializers.SerializerMethodField()
+
     class Meta:
         model = BudgetProgram
-        fields = ['id', 'title', 'description', 'period', 'created_at', 'updated_at']
+        fields = ['id', 'title', 'description', 'period', 'links', 'created_at', 'updated_at']
+
+    def get_links(self, obj):
+        links = obj.links.filter(is_active=True)
+        return BudgetProgramLinkSerializer(links, many=True).data
+
+
+class BudgetProgramLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BudgetProgramLink
+        fields = ['id', 'title', 'url', 'order', 'created_at', 'updated_at']
 
 
 class HonoraryProfessorSerializer(serializers.ModelSerializer):
