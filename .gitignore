@@ -5,3 +5,6 @@ __pycache__/
 # Virtual environment and specific files
 venv/
 GEMINI.md
+
+# Secrets
+.env
