@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 def normalize_link(value):
@@ -33,7 +34,7 @@ class MainPage(BaseModel):
     """Main page content"""
     main_photo = models.ImageField(upload_to='main_page/', blank=True, null=True, verbose_name="Главное фото")
     about_title = models.CharField(max_length=200, blank=True, verbose_name="Заголовок об академии")
-    about_description = models.TextField(blank=True, verbose_name="Описание об академии")
+    about_description = CKEditor5Field(blank=True, verbose_name="Описание об академии", config_name="extends")
     about_link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка об академии")
 
     class Meta:
@@ -67,7 +68,7 @@ class News(BaseModel):
     """News model"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
     slug = models.SlugField(max_length=200, unique=True, blank=True, verbose_name="URL-адрес")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
     photo = models.ImageField(upload_to='news/', blank=True, null=True, verbose_name="Фото")
     is_pinned = models.BooleanField(default=False, verbose_name="Закреплено")
     is_event = models.BooleanField(default=False, verbose_name="Событие")
@@ -103,7 +104,7 @@ class NewsPhoto(BaseModel):
 class Announcement(BaseModel):
     """Announcements model"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
     is_pinned = models.BooleanField(default=False, verbose_name="Закреплено")
     date = models.DateTimeField(default=timezone.now, verbose_name="Дата")
 
@@ -129,7 +130,7 @@ class EducationProgram(BaseModel):
 
     title = models.CharField(max_length=200, verbose_name="Название")
     program_type = models.CharField(max_length=20, choices=PROGRAM_TYPES, verbose_name="Тип программы")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
     link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
     photo = models.ImageField(upload_to='education/', blank=True, null=True, verbose_name="Фото")
     order = models.IntegerField(default=0, verbose_name="Порядок")
@@ -150,7 +151,7 @@ class EducationProgram(BaseModel):
 class EducationDirection(BaseModel):
     """Education directions model"""
     title = models.CharField(max_length=200, verbose_name="Название")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
     link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
     photo = models.ImageField(upload_to='education/directions/', blank=True, null=True, verbose_name="Фото")
 
@@ -190,7 +191,7 @@ class LibraryResource(BaseModel):
     """Electronic library resources"""
     category = models.ForeignKey(LibraryCategory, related_name='resources', on_delete=models.CASCADE, verbose_name="Категория библиотеки")
     title = models.CharField(max_length=200, verbose_name="Название")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
     photo = models.ImageField(upload_to='library/', blank=True, null=True, verbose_name="Фото")
     link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
     file = models.FileField(upload_to='library/files/', blank=True, null=True, verbose_name="Файл")
@@ -210,7 +211,7 @@ class LibraryResource(BaseModel):
 class Contact(BaseModel):
     """Contacts model"""
     title = models.CharField(max_length=200, verbose_name="Название")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
     photo = models.ImageField(upload_to='contacts/', blank=True, null=True, verbose_name="Фото")
     email = models.EmailField(blank=True, verbose_name="Email")
     phone = models.CharField(max_length=50, blank=True, verbose_name="Телефон")
@@ -240,7 +241,7 @@ class ContactDepartment(BaseModel):
     contact = models.ForeignKey(Contact, related_name='departments', on_delete=models.CASCADE, verbose_name="Контакт")
     department_type = models.CharField(max_length=20, choices=DEPARTMENT_TYPES, verbose_name="Тип отдела")
     title = models.CharField(max_length=200, verbose_name="Название")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
 
     class Meta:
         verbose_name = "Отдел контактов"
@@ -276,15 +277,15 @@ class AboutAcademy(BaseModel):
     """About Academy main content"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
     main_photo = models.ImageField(upload_to='about/', blank=True, null=True, verbose_name="Главное фото")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
     photo = models.ImageField(upload_to='about/', blank=True, null=True, verbose_name="Фото")
-    additional_description = models.TextField(blank=True, verbose_name="Дополнительное описание")
+    additional_description = CKEditor5Field(blank=True, verbose_name="Дополнительное описание", config_name="extends")
     block1_title = models.CharField(max_length=200, blank=True, verbose_name="Заголовок блока 1")
-    block1_description = models.TextField(blank=True, verbose_name="Описание блока 1")
+    block1_description = CKEditor5Field(blank=True, verbose_name="Описание блока 1", config_name="extends")
     block2_title = models.CharField(max_length=200, blank=True, verbose_name="Заголовок блока 2")
-    block2_description = models.TextField(blank=True, verbose_name="Описание блока 2")
+    block2_description = CKEditor5Field(blank=True, verbose_name="Описание блока 2", config_name="extends")
     mission_title = models.CharField(max_length=200, default="Миссия академии", verbose_name="Заголовок миссии")
-    mission_description = models.TextField(blank=True, verbose_name="Описание миссии")
+    mission_description = CKEditor5Field(blank=True, verbose_name="Описание миссии", config_name="extends")
 
     class Meta:
         verbose_name = "Об академии"
@@ -317,7 +318,7 @@ class Partner(BaseModel):
 class AcademyCharter(BaseModel):
     """Academy Charter"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = models.TextField(blank=True, verbose_name="Описание")
+    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
     file = models.FileField(upload_to='documents/charter/', blank=True, null=True, verbose_name="Файл")
 
     class Meta:
@@ -351,7 +352,7 @@ class AcademyCharterLink(BaseModel):
 class AcademyHistory(BaseModel):
     """Academy History"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = models.TextField(blank=True, verbose_name="Описание")
+    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
     file = models.FileField(upload_to='documents/history/', blank=True, null=True, verbose_name="Файл")
 
     class Meta:
@@ -365,7 +366,7 @@ class AcademyHistory(BaseModel):
 class AcademyLogo(BaseModel):
     """Academy Logo"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = models.TextField(blank=True, verbose_name="Описание")
+    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
     logo = models.ImageField(upload_to='logo/', verbose_name="Логотип")
 
     class Meta:
@@ -380,7 +381,7 @@ class OrganizationalStructure(BaseModel):
     """Organizational Structure"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
     scheme = models.ImageField(upload_to='structure/', blank=True, null=True, verbose_name="Схема")
-    description = models.TextField(blank=True, verbose_name="Описание")
+    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
 
     class Meta:
         verbose_name = "Организационная структура"
@@ -394,7 +395,7 @@ class Department(BaseModel):
     """Departments in organizational structure"""
     structure = models.ForeignKey(OrganizationalStructure, related_name='departments', on_delete=models.CASCADE, verbose_name="Организационная структура")
     name = models.CharField(max_length=200, verbose_name="Название")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
     order = models.IntegerField(default=0, verbose_name="Порядок")
 
     class Meta:
@@ -436,7 +437,7 @@ class AcademicCouncilFile(BaseModel):
 class TradeUnion(BaseModel):
     """Trade Union Committee"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
 
     class Meta:
         verbose_name = "Профсоюзный комитет"
@@ -495,7 +496,7 @@ class QualityManagementFile(BaseModel):
 class Bulletin(BaseModel):
     """Bulletin АГУПКР"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = models.TextField(blank=True, verbose_name="Описание")
+    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
 
     class Meta:
         verbose_name = "Вестник АГУПКР"
@@ -542,7 +543,7 @@ class BulletinFile(BaseModel):
 class BudgetProgram(BaseModel):
     """Budget Programs Project"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = models.TextField(blank=True, verbose_name="Описание")
+    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
     period = models.CharField(max_length=50, blank=True, verbose_name="Период")
 
     class Meta:
@@ -577,7 +578,7 @@ class HonoraryProfessor(BaseModel):
     """Honorary Professors"""
     name = models.CharField(max_length=200, verbose_name="Имя")
     photo = models.ImageField(upload_to='professors/', blank=True, null=True, verbose_name="Фото")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
     order = models.IntegerField(default=0, verbose_name="Порядок")
 
     class Meta:
@@ -592,7 +593,7 @@ class HonoraryProfessor(BaseModel):
 class InternationalCooperation(BaseModel):
     """International Cooperation"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = models.TextField(blank=True, verbose_name="Описание")
+    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
     photo = models.ImageField(upload_to='cooperation/', blank=True, null=True, verbose_name="Фото")
 
     class Meta:
@@ -624,7 +625,7 @@ class InternationalCooperationLink(BaseModel):
 class AcademicHonesty(BaseModel):
     """Academic Honesty"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = models.TextField(verbose_name="Описание")
+    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
     photo = models.ImageField(upload_to='honesty/', blank=True, null=True, verbose_name="Фото")
 
     class Meta:
@@ -681,7 +682,7 @@ class Schedule(BaseModel):
 class Survey(BaseModel):
     """Survey/Questionnaire model"""
     title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = models.TextField(blank=True, verbose_name="Описание")
+    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
     link = models.CharField(max_length=500, verbose_name="Ссылка")
 
     class Meta:
