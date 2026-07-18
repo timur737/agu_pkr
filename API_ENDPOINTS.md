@@ -11,90 +11,48 @@
 ## Base URL
 `/api/`
 
-## Main Endpoints
+## Основные endpoints новой CMS-структуры
 
-### Главная страница
-- `GET /api/main-page/` - Получить главную страницу
-- `GET /api/main-page/{id}/` - Детали главной страницы
-- `GET /api/mainpageslider/` - Слайдер главной страницы
+### Страницы сайта
+- `GET /api/pages/` — список активных страниц в порядке админ-панели.
+- `GET /api/pages/{slug}/` — детальная страница с вложенными подстраницами и блоками.
+- `POST /api/pages/` — создать страницу.
+- `PUT/PATCH /api/pages/{slug}/` — обновить страницу.
+- `DELETE /api/pages/{slug}/` — удалить страницу.
 
-### Новости и события
-- `GET /api/news/` - Список новостей
-- `GET /api/news/{id}/` - Детали новости
-- `GET /api/news/events/` - Все события
-- `GET /api/news/pinned/` - Закрепленные новости
-- `GET /api/news-photos/` - Фото новостей
-- `GET /api/announcements/` - Объявления
-- `GET /api/announcements/pinned/` - Закрепленные объявления
+Фильтры и сортировка:
+- `?group=home|about|abdrakhmanov|ideology|professional_development|education|science|international|contacts`
+- `?parent={id}` — получить подстраницы конкретной главной страницы.
+- `?is_development=true` — показать страницы в разработке.
+- `?search=текст` — поиск по названию, описанию и slug.
+- `?ordering=order` или `?ordering=-created_at`.
 
-### Образование
-- `GET /api/education-programs/` - Образовательные программы
-- `GET /api/education-directions/` - Направления образования
+### Блоки страниц
+- `GET /api/page-blocks/` — список активных блоков.
+- `GET /api/page-blocks/{id}/` — детальный блок.
+- `POST /api/page-blocks/` — создать блок.
+- `PUT/PATCH /api/page-blocks/{id}/` — обновить блок.
+- `DELETE /api/page-blocks/{id}/` — удалить блок.
 
-### Библиотека
-- `GET /api/library-categories/` - Категории библиотеки
-- `GET /api/library-resources/` - Ресурсы библиотеки
+Типы блоков:
+- `text` — текст / description.
+- `photo_text` — фото + description.
+- `link` — ссылка под текстом или редирект.
+- `pdf` — PDF файл, который фронтенд может скрывать под текстом.
+- `number` — текстовое поле с цифрой.
+- `social` — ссылка на социальную сеть.
+- `slider` — слайд карусели с фото, датой и текстом.
 
-### Контакты
-- `GET /api/contacts/` - Контакты
-- `GET /api/contact-departments/` - Отделы контактов
-- `GET /api/social-links/` - Социальные сети
-
-### Об академии
-- `GET /api/about-academy/` - Об академии
-- `GET /api/partners/` - Партнеры
-- `GET /api/academy-charter/` - Устав академии
-- `GET /api/academy-history/` - История академии
-- `GET /api/academy-logo/` - Логотип академии
-- `GET /api/organizational-structure/` - Организационная структура
-- `GET /api/departments/` - Департаменты
-- `GET /api/academic-council/` - Ученый совет
-- `GET /api/academic-council-files/` - Файлы ученого совета
-- `GET /api/trade-union/` - Профсоюзный комитет
-- `GET /api/quality-management/` - Система менеджмента качества
-- `GET /api/quality-management-files/` - Файлы системы качества
-- `GET /api/bulletin/` - Вестник АГУПКР
-- `GET /api/bulletin-files/` - Файлы вестника
-- `GET /api/budget-programs/` - Проект бюджетных программ
-- `GET /api/honorary-professors/` - Почетные профессора
-- `GET /api/international-cooperation/` - Международное сотрудничество
-- `GET /api/international-cooperation-links/` - Ссылки сотрудничества
-- `GET /api/academic-honesty/` - Академическая честность
-- `GET /api/legal-documents/` - Нормативно-правовые акты
-
-### Расписание
-- `GET /api/schedules/` - Расписания
-- `GET /api/surveys/` - Анкетирование
-
-## Фильтрация и поиск
-
-### Новости
-- `?is_pinned=true` - Закрепленные новости
-- `?is_event=true` - События
-- `?search=текст` - Поиск по заголовку и описанию
-- `?ordering=-date` - Сортировка по дате
-
-### Образовательные программы
-- `?program_type=bachelor` - Фильтр по типу программы
-- `?search=текст` - Поиск
-
-### Библиотека
-- `?category={id}` - Фильтр по категории
-
-### Нормативно-правовые акты
-- `?document_type=external` - Внешние документы
-- `?document_type=internal` - Внутренние документы
-
-## Пагинация
-Все списки используют пагинацию (20 элементов на страницу):
-- `?page=1` - Номер страницы
+Фильтры и сортировка:
+- `?page_id={id}` — блоки конкретной страницы (`page` зарезервирован под пагинацию).
+- `?block_type=text|photo_text|link|pdf|number|social|slider`.
+- `?search=текст` — поиск по названию, описанию, ссылке и значению.
+- `?ordering=order` или `?ordering=-created_at`.
 
 ## Админ-панель
-Доступна по адресу: `/admin/`
-Использует Jazzmin для красивого интерфейса.
+Доступна по адресу: `/admin/`.
+Авторизация, Django admin и Jazzmin-дизайн сохранены. Старые модели контента удалены из админ-панели и заменены двумя разделами:
+- **01. Страницы сайта** — главные страницы, подстраницы и общие поля страницы.
+- **02. Блоки страниц** — повторяемые блоки, файлы, ссылки, соцсети, цифры и слайды.
 
-## Документация API
-- Swagger UI: `/swagger/` - Интерактивная документация с возможностью тестирования API
-- ReDoc: `/redoc/` - Альтернативный стиль документации
-- JSON Schema: `/swagger.json` - Схема API в формате JSON
-- YAML Schema: `/swagger.yaml` - Схема API в формате YAML
+При применении миграций автоматически создается структура страниц в порядке из ТЗ, а подстраницы привязываются к соответствующим главным страницам.
