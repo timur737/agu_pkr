@@ -1,27 +1,19 @@
 from django.db import models
-from django.urls import reverse
-from django.utils import timezone
-from django.utils.text import slugify
-from django_ckeditor_5.fields import CKEditor5Field
 
 
 def normalize_link(value):
     if not value:
         return value
-
     value = value.strip()
     if not value or value.startswith(('/', '#')):
         return value
-
     first_part = value.split('/', 1)[0]
     if ':' in first_part and first_part.split(':', 1)[0].lower() in {'http', 'https', 'mailto', 'tel', 'ftp', 'ftps'}:
         return value
-
     return f"https://{value}"
 
 
 class BaseModel(models.Model):
-    """Base model with common fields"""
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     is_active = models.BooleanField(default=True, verbose_name="Активно")
@@ -30,687 +22,93 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class MainPage(BaseModel):
-    """Main page content"""
-    main_photo = models.ImageField(upload_to='main_page/', blank=True, null=True, verbose_name="Главное фото")
-    about_title = models.CharField(max_length=200, blank=True, verbose_name="Заголовок об академии")
-    about_description = CKEditor5Field(blank=True, verbose_name="Описание об академии", config_name="extends")
-    about_link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка об академии")
+class AdminPage(BaseModel):
+    """Editable site page shown in the admin panel in the requested structure."""
 
-    class Meta:
-        verbose_name = "Главная страница"
-        verbose_name_plural = "Главная страница"
+    GROUP_HOME = 'home'
+    GROUP_ABOUT = 'about'
+    GROUP_ABDRAKHMANOV = 'abdrakhmanov'
+    GROUP_IDEOLOGY = 'ideology'
+    GROUP_PROFESSIONAL_DEVELOPMENT = 'professional_development'
+    GROUP_EDUCATION = 'education'
+    GROUP_SCIENCE = 'science'
+    GROUP_INTERNATIONAL = 'international'
+    GROUP_CONTACTS = 'contacts'
 
-    def __str__(self):
-        return "Главная страница"
-
-    def save(self, *args, **kwargs):
-        self.about_link = normalize_link(self.about_link)
-        super().save(*args, **kwargs)
-
-
-class MainPageSlider(BaseModel):
-    """Main page slider item"""
-    date = models.DateField(verbose_name="Дата")
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    img = models.ImageField(upload_to='main_page_slider/', verbose_name="Изображение")
-
-    class Meta:
-        verbose_name = "Слайд главной страницы"
-        verbose_name_plural = "Слайдер главной страницы"
-        ordering = ['-date']
-
-    def __str__(self):
-        return self.title
-
-
-class News(BaseModel):
-    """News model"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    slug = models.SlugField(max_length=200, unique=True, blank=True, verbose_name="URL-адрес")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-    photo = models.ImageField(upload_to='news/', blank=True, null=True, verbose_name="Фото")
-    is_pinned = models.BooleanField(default=False, verbose_name="Закреплено")
-    is_event = models.BooleanField(default=False, verbose_name="Событие")
-    date = models.DateTimeField(auto_now_add=True, verbose_name="Дата")
-
-    class Meta:
-        verbose_name = "Новость"
-        verbose_name_plural = "Новости"
-        ordering = ['-date']
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
-
-class NewsPhoto(BaseModel):
-    """Additional photos for news"""
-    news = models.ForeignKey(News, related_name='photos', on_delete=models.CASCADE, verbose_name="Новость")
-    photo = models.ImageField(upload_to='news/photos/', verbose_name="Фото")
-
-    class Meta:
-        verbose_name = "Фото новости"
-        verbose_name_plural = "Фото новостей"
-
-    def __str__(self):
-        return f"Фото для {self.news.title}"
-
-
-class Announcement(BaseModel):
-    """Announcements model"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-    is_pinned = models.BooleanField(default=False, verbose_name="Закреплено")
-    date = models.DateTimeField(default=timezone.now, verbose_name="Дата")
-
-    class Meta:
-        verbose_name = "Объявление"
-        verbose_name_plural = "Объявления"
-        ordering = ['-is_pinned', '-date']
-
-    def __str__(self):
-        return self.title
-
-
-class EducationProgram(BaseModel):
-    """Education programs model"""
-    PROGRAM_TYPES = [
-        ('bachelor', 'Бакалавриат'),
-        ('master', 'Магистратура'),
-        ('phd', 'Аспирантура'),
-        ('doctorate', 'Докторантура'),
-        ('cppk', 'ЦППК - Центр подготовки и повышения квалификации'),
-        ('spo', 'СПО - Среднее профессиональное образование'),
+    GROUP_CHOICES = [
+        (GROUP_HOME, 'Главная страница'),
+        (GROUP_ABOUT, 'О нас'),
+        (GROUP_ABDRAKHMANOV, 'Жусуп Абдрахманов'),
+        (GROUP_IDEOLOGY, 'Национальная Идеология'),
+        (GROUP_PROFESSIONAL_DEVELOPMENT, 'Профессиональное развитие'),
+        (GROUP_EDUCATION, 'Образование'),
+        (GROUP_SCIENCE, 'Наука и инновации'),
+        (GROUP_INTERNATIONAL, 'Международное сотрудничество'),
+        (GROUP_CONTACTS, 'Контакты'),
     ]
 
-    title = models.CharField(max_length=200, verbose_name="Название")
-    program_type = models.CharField(max_length=20, choices=PROGRAM_TYPES, verbose_name="Тип программы")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-    link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
-    photo = models.ImageField(upload_to='education/', blank=True, null=True, verbose_name="Фото")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
+    title = models.CharField(max_length=255, verbose_name="Название блока")
+    slug = models.SlugField(max_length=120, unique=True, verbose_name="Системный URL")
+    group = models.CharField(max_length=40, choices=GROUP_CHOICES, verbose_name="Главная страница раздела")
+    parent = models.ForeignKey('self', related_name='subpages', on_delete=models.CASCADE, blank=True, null=True, verbose_name="Родительская страница")
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    main_photo = models.ImageField(upload_to='pages/main/', blank=True, null=True, verbose_name="Главная фотография")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    redirect_url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка на редирект")
+    pdf_file = models.FileField(upload_to='pages/pdfs/', blank=True, null=True, verbose_name="PDF файл")
+    is_development = models.BooleanField(default=False, verbose_name="В разработке")
 
     class Meta:
-        verbose_name = "Образовательная программа"
-        verbose_name_plural = "Образовательные программы"
-        ordering = ['order', 'title']
-
-    def __str__(self):
-        return f"{self.get_program_type_display()} - {self.title}"
-
-    def save(self, *args, **kwargs):
-        self.link = normalize_link(self.link)
-        super().save(*args, **kwargs)
-
-
-class EducationDirection(BaseModel):
-    """Education directions model"""
-    title = models.CharField(max_length=200, verbose_name="Название")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-    link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
-    photo = models.ImageField(upload_to='education/directions/', blank=True, null=True, verbose_name="Фото")
-
-    class Meta:
-        verbose_name = "Направление образования"
-        verbose_name_plural = "Направления образования"
+        verbose_name = "Страница"
+        verbose_name_plural = "01. Страницы сайта"
+        ordering = ['order', 'id']
 
     def __str__(self):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.link = normalize_link(self.link)
+        self.redirect_url = normalize_link(self.redirect_url)
         super().save(*args, **kwargs)
 
 
-class LibraryCategory(BaseModel):
-    """Library categories"""
-    title = models.CharField(max_length=200, verbose_name="Название")
-    slug = models.SlugField(max_length=200, unique=True, blank=True, verbose_name="URL-адрес")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
+class PageBlock(BaseModel):
+    TYPE_TEXT = 'text'
+    TYPE_PHOTO_TEXT = 'photo_text'
+    TYPE_LINK = 'link'
+    TYPE_PDF = 'pdf'
+    TYPE_NUMBER = 'number'
+    TYPE_SOCIAL = 'social'
+    TYPE_SLIDER = 'slider'
 
-    class Meta:
-        verbose_name = "Категория библиотеки"
-        verbose_name_plural = "Категории библиотеки"
-        ordering = ['order', 'title']
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.title
-
-
-class LibraryResource(BaseModel):
-    """Electronic library resources"""
-    category = models.ForeignKey(LibraryCategory, related_name='resources', on_delete=models.CASCADE, verbose_name="Категория библиотеки")
-    title = models.CharField(max_length=200, verbose_name="Название")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-    photo = models.ImageField(upload_to='library/', blank=True, null=True, verbose_name="Фото")
-    link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
-    file = models.FileField(upload_to='library/files/', blank=True, null=True, verbose_name="Файл")
-
-    class Meta:
-        verbose_name = "Ресурс библиотеки"
-        verbose_name_plural = "Ресурсы библиотеки"
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        self.link = normalize_link(self.link)
-        super().save(*args, **kwargs)
-
-
-class Contact(BaseModel):
-    """Contacts model"""
-    title = models.CharField(max_length=200, verbose_name="Название")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-    photo = models.ImageField(upload_to='contacts/', blank=True, null=True, verbose_name="Фото")
-    email = models.EmailField(blank=True, verbose_name="Email")
-    phone = models.CharField(max_length=50, blank=True, verbose_name="Телефон")
-    address = models.TextField(blank=True, verbose_name="Адрес")
-    map_url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка на карту")
-    map_embed = models.TextField(blank=True, verbose_name="Код карты (embed)")
-
-    class Meta:
-        verbose_name = "Контакт"
-        verbose_name_plural = "Контакты"
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        self.map_url = normalize_link(self.map_url)
-        super().save(*args, **kwargs)
-
-
-class ContactDepartment(BaseModel):
-    """Contact departments"""
-    DEPARTMENT_TYPES = [
-        ('reception', 'Приемная и отделы'),
-        ('academic', 'Академические структуры'),
-        ('programs', 'Программы'),
+    TYPE_CHOICES = [
+        (TYPE_TEXT, 'Текст / description'),
+        (TYPE_PHOTO_TEXT, 'Фото + description'),
+        (TYPE_LINK, 'Ссылка под текстом'),
+        (TYPE_PDF, 'PDF файл скрытый под текстом'),
+        (TYPE_NUMBER, 'Текстовое поле с цифрой'),
+        (TYPE_SOCIAL, 'Ссылка на социальную сеть'),
+        (TYPE_SLIDER, 'Слайд карусели'),
     ]
-    contact = models.ForeignKey(Contact, related_name='departments', on_delete=models.CASCADE, verbose_name="Контакт")
-    department_type = models.CharField(max_length=20, choices=DEPARTMENT_TYPES, verbose_name="Тип отдела")
-    title = models.CharField(max_length=200, verbose_name="Название")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
 
-    class Meta:
-        verbose_name = "Отдел контактов"
-        verbose_name_plural = "Отделы контактов"
-
-    def __str__(self):
-        return f"{self.get_department_type_display()} - {self.title}"
-
-
-class SocialLink(BaseModel):
-    """Social media links"""
-    name = models.CharField(max_length=100, verbose_name="Название")
-    url = models.CharField(max_length=500, verbose_name="Ссылка")
-    icon = models.ImageField(upload_to='social_icons/', blank=True, null=True, verbose_name="Иконка")
-    show_in_header = models.BooleanField(default=True, verbose_name="Показывать в шапке")
-    show_in_footer = models.BooleanField(default=True, verbose_name="Показывать в подвале")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
-
-    class Meta:
-        verbose_name = "Социальная сеть"
-        verbose_name_plural = "Социальные сети"
-        ordering = ['order']
-
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        self.url = normalize_link(self.url)
-        super().save(*args, **kwargs)
-
-
-class AboutAcademy(BaseModel):
-    """About Academy main content"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    main_photo = models.ImageField(upload_to='about/', blank=True, null=True, verbose_name="Главное фото")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-    photo = models.ImageField(upload_to='about/', blank=True, null=True, verbose_name="Фото")
-    additional_description = CKEditor5Field(blank=True, verbose_name="Дополнительное описание", config_name="extends")
-    block1_title = models.CharField(max_length=200, blank=True, verbose_name="Заголовок блока 1")
-    block1_description = CKEditor5Field(blank=True, verbose_name="Описание блока 1", config_name="extends")
-    block2_title = models.CharField(max_length=200, blank=True, verbose_name="Заголовок блока 2")
-    block2_description = CKEditor5Field(blank=True, verbose_name="Описание блока 2", config_name="extends")
-    mission_title = models.CharField(max_length=200, default="Миссия академии", verbose_name="Заголовок миссии")
-    mission_description = CKEditor5Field(blank=True, verbose_name="Описание миссии", config_name="extends")
-
-    class Meta:
-        verbose_name = "Об академии"
-        verbose_name_plural = "Об академии"
-
-    def __str__(self):
-        return "Об академии"
-
-
-class Partner(BaseModel):
-    """Partners model"""
-    name = models.CharField(max_length=200, verbose_name="Название")
-    photo = models.ImageField(upload_to='partners/', verbose_name="Логотип")
+    page = models.ForeignKey(AdminPage, related_name='blocks', on_delete=models.CASCADE, verbose_name="Страница")
+    block_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_TEXT, verbose_name="Тип блока")
+    title = models.CharField(max_length=255, blank=True, verbose_name="Название / текст ссылки")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    date = models.DateField(blank=True, null=True, verbose_name="Дата")
+    photo = models.ImageField(upload_to='pages/blocks/photos/', blank=True, null=True, verbose_name="Фото")
+    file = models.FileField(upload_to='pages/blocks/files/', blank=True, null=True, verbose_name="PDF файл")
     url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
+    value = models.CharField(max_length=120, blank=True, verbose_name="Значение / цифра")
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
 
     class Meta:
-        verbose_name = "Партнер"
-        verbose_name_plural = "Партнеры"
-        ordering = ['order']
+        verbose_name = "Блок страницы"
+        verbose_name_plural = "02. Блоки страниц"
+        ordering = ['page__order', 'order', 'id']
 
     def __str__(self):
-        return self.name
+        return self.title or self.get_block_type_display()
 
     def save(self, *args, **kwargs):
         self.url = normalize_link(self.url)
-        super().save(*args, **kwargs)
-
-
-class AcademyCharter(BaseModel):
-    """Academy Charter"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
-    file = models.FileField(upload_to='documents/charter/', blank=True, null=True, verbose_name="Файл")
-
-    class Meta:
-        verbose_name = "Устав академии"
-        verbose_name_plural = "Устав академии"
-
-    def __str__(self):
-        return self.title
-
-
-class AcademyCharterLink(BaseModel):
-    """Academy Charter links"""
-    charter = models.ForeignKey(AcademyCharter, related_name='links', on_delete=models.CASCADE, verbose_name="Устав академии")
-    title = models.CharField(max_length=200, blank=True, verbose_name="Название")
-    url = models.CharField(max_length=500, verbose_name="Ссылка")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
-
-    class Meta:
-        verbose_name = "Ссылка устава академии"
-        verbose_name_plural = "Ссылки устава академии"
-        ordering = ['order', 'id']
-
-    def __str__(self):
-        return self.title or self.url
-
-    def save(self, *args, **kwargs):
-        self.url = normalize_link(self.url)
-        super().save(*args, **kwargs)
-
-
-class AcademyHistory(BaseModel):
-    """Academy History"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
-    file = models.FileField(upload_to='documents/history/', blank=True, null=True, verbose_name="Файл")
-
-    class Meta:
-        verbose_name = "История академии"
-        verbose_name_plural = "История академии"
-
-    def __str__(self):
-        return self.title
-
-
-class AcademyLogo(BaseModel):
-    """Academy Logo"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
-    logo = models.ImageField(upload_to='logo/', verbose_name="Логотип")
-
-    class Meta:
-        verbose_name = "Логотип академии"
-        verbose_name_plural = "Логотип академии"
-
-    def __str__(self):
-        return self.title
-
-
-class OrganizationalStructure(BaseModel):
-    """Organizational Structure"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    scheme = models.ImageField(upload_to='structure/', blank=True, null=True, verbose_name="Схема")
-    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
-
-    class Meta:
-        verbose_name = "Организационная структура"
-        verbose_name_plural = "Организационная структура"
-
-    def __str__(self):
-        return self.title
-
-
-class Department(BaseModel):
-    """Departments in organizational structure"""
-    structure = models.ForeignKey(OrganizationalStructure, related_name='departments', on_delete=models.CASCADE, verbose_name="Организационная структура")
-    name = models.CharField(max_length=200, verbose_name="Название")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
-
-    class Meta:
-        verbose_name = "Департамент"
-        verbose_name_plural = "Департаменты"
-        ordering = ['order']
-
-    def __str__(self):
-        return self.name
-
-
-class AcademicCouncil(BaseModel):
-    """Academic Council"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    composition = models.TextField(verbose_name="Состав УС")
-
-    class Meta:
-        verbose_name = "Ученый совет"
-        verbose_name_plural = "Ученый совет"
-
-    def __str__(self):
-        return self.title
-
-
-class AcademicCouncilFile(BaseModel):
-    """Academic Council Files"""
-    council = models.ForeignKey(AcademicCouncil, related_name='files', on_delete=models.CASCADE, verbose_name="Ученый совет")
-    title = models.CharField(max_length=200, verbose_name="Название")
-    file = models.FileField(upload_to='documents/council/', verbose_name="Файл")
-
-    class Meta:
-        verbose_name = "Файл ученого совета"
-        verbose_name_plural = "Файлы ученого совета"
-
-    def __str__(self):
-        return self.title
-
-
-class TradeUnion(BaseModel):
-    """Trade Union Committee"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-
-    class Meta:
-        verbose_name = "Профсоюзный комитет"
-        verbose_name_plural = "Профсоюзный комитет"
-
-    def __str__(self):
-        return self.title
-
-
-class TradeUnionLink(BaseModel):
-    """Trade Union Committee links"""
-    trade_union = models.ForeignKey(TradeUnion, related_name='links', on_delete=models.CASCADE, verbose_name="Профсоюзный комитет")
-    title = models.CharField(max_length=200, blank=True, verbose_name="Название")
-    url = models.CharField(max_length=500, verbose_name="Ссылка")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
-
-    class Meta:
-        verbose_name = "Ссылка профсоюзного комитета"
-        verbose_name_plural = "Ссылки профсоюзного комитета"
-        ordering = ['order', 'id']
-
-    def __str__(self):
-        return self.title or self.url
-
-    def save(self, *args, **kwargs):
-        self.url = normalize_link(self.url)
-        super().save(*args, **kwargs)
-
-
-class QualityManagement(BaseModel):
-    """Quality Management System"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-
-    class Meta:
-        verbose_name = "Система менеджмента качества"
-        verbose_name_plural = "Система менеджмента качества"
-
-    def __str__(self):
-        return self.title
-
-
-class QualityManagementFile(BaseModel):
-    """Quality Management Files"""
-    quality = models.ForeignKey(QualityManagement, related_name='files', on_delete=models.CASCADE, verbose_name="Система менеджмента качества")
-    title = models.CharField(max_length=200, verbose_name="Название")
-    file = models.FileField(upload_to='documents/quality/', verbose_name="Файл")
-
-    class Meta:
-        verbose_name = "Файл системы качества"
-        verbose_name_plural = "Файлы системы качества"
-
-    def __str__(self):
-        return self.title
-
-
-class Bulletin(BaseModel):
-    """Bulletin АГУПКР"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
-
-    class Meta:
-        verbose_name = "Вестник АГУПКР"
-        verbose_name_plural = "Вестник АГУПКР"
-
-    def __str__(self):
-        return self.title
-
-
-class BulletinLink(BaseModel):
-    """Bulletin links"""
-    bulletin = models.ForeignKey(Bulletin, related_name='links', on_delete=models.CASCADE, verbose_name="Вестник")
-    title = models.CharField(max_length=200, blank=True, verbose_name="Название")
-    url = models.CharField(max_length=500, verbose_name="Ссылка")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
-
-    class Meta:
-        verbose_name = "Ссылка вестника"
-        verbose_name_plural = "Ссылки вестника"
-        ordering = ['order', 'id']
-
-    def __str__(self):
-        return self.title or self.url
-
-    def save(self, *args, **kwargs):
-        self.url = normalize_link(self.url)
-        super().save(*args, **kwargs)
-
-
-class BulletinFile(BaseModel):
-    """Bulletin Files"""
-    bulletin = models.ForeignKey(Bulletin, related_name='files', on_delete=models.CASCADE, verbose_name="Вестник")
-    title = models.CharField(max_length=200, verbose_name="Название")
-    file = models.FileField(upload_to='documents/bulletin/', verbose_name="Файл")
-
-    class Meta:
-        verbose_name = "Файл вестника"
-        verbose_name_plural = "Файлы вестника"
-
-    def __str__(self):
-        return self.title
-
-
-class BudgetProgram(BaseModel):
-    """Budget Programs Project"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
-    period = models.CharField(max_length=50, blank=True, verbose_name="Период")
-
-    class Meta:
-        verbose_name = "Проект бюджетных программ"
-        verbose_name_plural = "Проект бюджетных программ"
-
-    def __str__(self):
-        return self.title
-
-
-class BudgetProgramLink(BaseModel):
-    """Budget Program links"""
-    budget_program = models.ForeignKey(BudgetProgram, related_name='links', on_delete=models.CASCADE, verbose_name="Проект бюджетных программ")
-    title = models.CharField(max_length=200, blank=True, verbose_name="Название")
-    url = models.CharField(max_length=500, verbose_name="Ссылка")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
-
-    class Meta:
-        verbose_name = "Ссылка проекта бюджетных программ"
-        verbose_name_plural = "Ссылки проекта бюджетных программ"
-        ordering = ['order', 'id']
-
-    def __str__(self):
-        return self.title or self.url
-
-    def save(self, *args, **kwargs):
-        self.url = normalize_link(self.url)
-        super().save(*args, **kwargs)
-
-
-class HonoraryProfessor(BaseModel):
-    """Honorary Professors"""
-    name = models.CharField(max_length=200, verbose_name="Имя")
-    photo = models.ImageField(upload_to='professors/', blank=True, null=True, verbose_name="Фото")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
-
-    class Meta:
-        verbose_name = "Почетный профессор"
-        verbose_name_plural = "Почетные профессора"
-        ordering = ['order']
-
-    def __str__(self):
-        return self.name
-
-
-class InternationalCooperation(BaseModel):
-    """International Cooperation"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
-    photo = models.ImageField(upload_to='cooperation/', blank=True, null=True, verbose_name="Фото")
-
-    class Meta:
-        verbose_name = "Международное сотрудничество"
-        verbose_name_plural = "Международное сотрудничество"
-
-    def __str__(self):
-        return self.title
-
-
-class InternationalCooperationLink(BaseModel):
-    """International Cooperation Links"""
-    cooperation = models.ForeignKey(InternationalCooperation, related_name='links', on_delete=models.CASCADE, verbose_name="Международное сотрудничество")
-    title = models.CharField(max_length=200, verbose_name="Название")
-    url = models.CharField(max_length=500, verbose_name="Ссылка")
-
-    class Meta:
-        verbose_name = "Ссылка сотрудничества"
-        verbose_name_plural = "Ссылки сотрудничества"
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        self.url = normalize_link(self.url)
-        super().save(*args, **kwargs)
-
-
-class AcademicHonesty(BaseModel):
-    """Academic Honesty"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = CKEditor5Field(verbose_name="Описание", config_name="extends")
-    photo = models.ImageField(upload_to='honesty/', blank=True, null=True, verbose_name="Фото")
-
-    class Meta:
-        verbose_name = "Академическая честность"
-        verbose_name_plural = "Академическая честность"
-
-    def __str__(self):
-        return self.title
-
-
-class LegalDocument(BaseModel):
-    """Legal Documents"""
-    DOCUMENT_TYPES = [
-        ('external', 'Внешние'),
-        ('internal', 'Внутренние'),
-    ]
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    document_type = models.CharField(max_length=20, choices=DOCUMENT_TYPES, verbose_name="Тип документа")
-    file = models.FileField(upload_to='documents/legal/', verbose_name="Файл")
-
-    class Meta:
-        verbose_name = "Нормативно-правовой акт"
-        verbose_name_plural = "Нормативно-правовые акты"
-
-    def __str__(self):
-        return f"{self.get_document_type_display()} - {self.title}"
-
-
-class Schedule(BaseModel):
-    """Schedule model"""
-    SCHEDULE_TYPES = [
-        ('bachelor', 'Расписание бакалавра'),
-        ('master', 'Расписание магистратуры'),
-        ('spo', 'Среднее проф образование'),
-        ('bells', 'Расписание звонков'),
-        ('graph_pb', 'График учебного процесса ПБ на 2025-2026 учебный год'),
-        ('graph_pm', 'График учебного процесса ПМ на 2026-2027 год'),
-        ('graph_pm_fhz', 'График учебного процесса ПМ ФХЗ 2025-2027 учебные года'),
-    ]
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    schedule_type = models.CharField(max_length=20, choices=SCHEDULE_TYPES, verbose_name="Тип расписания")
-    file = models.FileField(upload_to='schedules/', verbose_name="Файл")
-    order = models.IntegerField(default=0, verbose_name="Порядок")
-
-    class Meta:
-        verbose_name = "Расписание"
-        verbose_name_plural = "Расписания"
-        ordering = ['order']
-
-    def __str__(self):
-        return f"{self.get_schedule_type_display()} - {self.title}"
-
-
-class Survey(BaseModel):
-    """Survey/Questionnaire model"""
-    title = models.CharField(max_length=200, verbose_name="Заголовок")
-    description = CKEditor5Field(blank=True, verbose_name="Описание", config_name="extends")
-    link = models.CharField(max_length=500, verbose_name="Ссылка")
-
-    class Meta:
-        verbose_name = "Анкетирование"
-        verbose_name_plural = "Анкетирование"
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        self.link = normalize_link(self.link)
-        super().save(*args, **kwargs)
-
-
-class SiteSettings(BaseModel):
-    """Site settings"""
-    news_title = models.CharField(max_length=200, default="Новости", verbose_name="Заголовок новостей")
-    announcements_title = models.CharField(max_length=200, default="Объявления", verbose_name="Заголовок объявлений")
-    library_title = models.CharField(max_length=200, default="Электронная библиотека", verbose_name="Заголовок библиотеки")
-    library_link = models.CharField(max_length=500, blank=True, verbose_name="Ссылка на библиотеку (внешняя)")
-
-    class Meta:
-        verbose_name = "Настройки сайта"
-        verbose_name_plural = "Настройки сайта"
-
-    def __str__(self):
-        return "Настройки сайта"
-
-    def save(self, *args, **kwargs):
-        self.library_link = normalize_link(self.library_link)
         super().save(*args, **kwargs)
