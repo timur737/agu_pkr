@@ -44,7 +44,7 @@
 - `slider` — слайд карусели с фото, датой и текстом.
 
 Фильтры и сортировка:
-- `?page={id}` — блоки конкретной страницы.
+- `?page_id={id}` — блоки конкретной страницы (`page` зарезервирован под пагинацию).
 - `?block_type=text|photo_text|link|pdf|number|social|slider`.
 - `?search=текст` — поиск по названию, описанию, ссылке и значению.
 - `?ordering=order` или `?ordering=-created_at`.
