@@ -1,0 +1,1 @@
+import{j as s}from"./index-bst71qtg.js";const t=({title:e})=>s.jsx("div",{children:s.jsxs("div",{className:"flex items-center gap-2",children:[s.jsx("div",{className:"w-6 h-1 bg-sinii"}),s.jsx("p",{className:"text-2xl font-bold text-sinii",children:e})]})});export{t as L};
