@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 from corsheaders.defaults import default_headers
 
@@ -21,15 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@np5$ayckd@hpjk%0_&6+@l!5_1mvgnf2bx7ipg$96lgv02)a3'
+SECRET_KEY = config('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['91.213.233.195', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['91.213.233.203', 'new.apap.kg', 'localhost', '127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['http://91.213.233.195', 'https://91.213.233.195']
+CSRF_TRUSTED_ORIGINS = ['http://91.213.233.203', 'http://new.apap.kg', 'https://new.apap.kg', 'https://91.213.233.203']
 
 
 # Application definition
@@ -47,6 +46,7 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'drf_yasg',
+    "django_ckeditor_5",
     'app',
 ]
 
@@ -285,4 +285,141 @@ JAZZMIN_UI_TWEAKS = {
         "danger": "btn-danger",
         "success": "btn-success"
     }
+}
+
+CKEDITOR_5_FILE_UPLOAD_PERMISSION = "any"
+
+MODELTRANSLATION_CUSTOM_FIELDS = (
+    "CKEditor5Field",
+)
+CKEDITOR_5_CONFIGS = {
+    "default": {
+        "toolbar": {
+            "items": [
+                "heading",
+                "|",
+                "bold",
+                "italic",
+                "underline",
+                "link",
+                "|",
+                "bulletedList",
+                "numberedList",
+                "|",
+                "blockQuote",
+                "imageUpload",
+                "insertTable",
+                "|",
+                "undo",
+                "redo",
+            ],
+            "shouldNotGroupWhenFull": True,
+        },
+        "language": "ru",
+    },
+
+    "extends": {
+        "toolbar": {
+            "items": [
+                "heading",
+                "|",
+                "bold",
+                "italic",
+                "underline",
+                "strikethrough",
+                "link",
+                "|",
+                "fontSize",
+                "fontFamily",
+                "fontColor",
+                "fontBackgroundColor",
+                "|",
+                "bulletedList",
+                "numberedList",
+                "todoList",
+                "|",
+                "outdent",
+                "indent",
+                "|",
+                "blockQuote",
+                "insertTable",
+                "imageUpload",
+                "mediaEmbed",
+                "|",
+                "removeFormat",
+                "sourceEditing",
+                "|",
+                "undo",
+                "redo",
+            ],
+            "shouldNotGroupWhenFull": True,
+        },
+
+        "image": {
+            "toolbar": [
+                "imageTextAlternative",
+                "|",
+                "imageStyle:alignLeft",
+                "imageStyle:alignCenter",
+                "imageStyle:alignRight",
+                "imageStyle:side",
+            ],
+            "styles": [
+                "full",
+                "side",
+                "alignLeft",
+                "alignCenter",
+                "alignRight",
+            ],
+        },
+
+        "table": {
+            "contentToolbar": [
+                "tableColumn",
+                "tableRow",
+                "mergeTableCells",
+                "tableProperties",
+                "tableCellProperties",
+            ],
+        },
+
+        "heading": {
+            "options": [
+                {
+                    "model": "paragraph",
+                    "title": "Обычный текст",
+                    "class": "ck-heading_paragraph",
+                },
+                {
+                    "model": "heading1",
+                    "view": "h1",
+                    "title": "Заголовок 1",
+                    "class": "ck-heading_heading1",
+                },
+                {
+                    "model": "heading2",
+                    "view": "h2",
+                    "title": "Заголовок 2",
+                    "class": "ck-heading_heading2",
+                },
+                {
+                    "model": "heading3",
+                    "view": "h3",
+                    "title": "Заголовок 3",
+                    "class": "ck-heading_heading3",
+                },
+            ],
+        },
+
+        "language": "ru",
+    },
+}
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
 }
