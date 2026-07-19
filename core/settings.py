@@ -37,6 +37,7 @@ CSRF_TRUSTED_ORIGINS = ['http://91.213.233.195', 'https://91.213.233.195']
 INSTALLED_APPS = [
     'modeltranslation',
     'jazzmin',
+    'django_ckeditor_5',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -285,4 +286,28 @@ JAZZMIN_UI_TWEAKS = {
         "danger": "btn-danger",
         "success": "btn-success"
     }
+}
+
+
+# CKEditor 5 settings for rich description fields in Django admin
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': [
+            'heading', '|', 'bold', 'italic', 'underline', 'strikethrough', '|',
+            'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+            'insertTable', 'undo', 'redo'
+        ],
+        'language': 'ru',
+    },
+    'extends': {
+        'toolbar': [
+            'heading', '|', 'bold', 'italic', 'underline', 'strikethrough', '|',
+            'alignment', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+            'insertTable', 'mediaEmbed', 'undo', 'redo'
+        ],
+        'language': 'ru',
+        'table': {
+            'contentToolbar': ['tableColumn', 'tableRow', 'mergeTableCells']
+        },
+    },
 }
