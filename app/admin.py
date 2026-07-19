@@ -1,16 +1,24 @@
 from django.contrib import admin
+from django.db import models
 from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInline
 from .models import AdminPage, PageBlock
+from .widgets import CKEditorTextarea
 
 
-class PageBlockInline(TranslationTabularInline):
+class DescriptionCKEditorMixin:
+    formfield_overrides = {
+        models.TextField: {'widget': CKEditorTextarea},
+    }
+
+
+class PageBlockInline(DescriptionCKEditorMixin, TranslationTabularInline):
     model = PageBlock
     extra = 1
     fields = ('order', 'block_type', 'title', 'description', 'date', 'photo', 'file', 'url', 'value', 'is_active')
 
 
 @admin.register(AdminPage)
-class AdminPageAdmin(TabbedTranslationAdmin):
+class AdminPageAdmin(DescriptionCKEditorMixin, TabbedTranslationAdmin):
     list_display = ('order', 'title', 'group', 'parent', 'is_development', 'is_active')
     list_filter = ('group', 'is_development', 'is_active')
     search_fields = ('title', 'description', 'slug')
@@ -25,7 +33,7 @@ class AdminPageAdmin(TabbedTranslationAdmin):
 
 
 @admin.register(PageBlock)
-class PageBlockAdmin(TabbedTranslationAdmin):
+class PageBlockAdmin(DescriptionCKEditorMixin, TabbedTranslationAdmin):
     list_display = ('order', 'title', 'page', 'block_type', 'is_active')
     list_filter = ('page__group', 'page', 'block_type', 'is_active')
     search_fields = ('title', 'description', 'url', 'value')
