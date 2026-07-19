@@ -36,6 +36,7 @@ CSRF_TRUSTED_ORIGINS = ['http://91.213.233.203', 'http://new.apap.kg', 'https://
 INSTALLED_APPS = [
     'modeltranslation',
     'jazzmin',
+    'django_ckeditor_5',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -287,139 +288,26 @@ JAZZMIN_UI_TWEAKS = {
     }
 }
 
-CKEDITOR_5_FILE_UPLOAD_PERMISSION = "any"
 
-MODELTRANSLATION_CUSTOM_FIELDS = (
-    "CKEditor5Field",
-)
+# CKEditor 5 settings for rich description fields in Django admin
 CKEDITOR_5_CONFIGS = {
-    "default": {
-        "toolbar": {
-            "items": [
-                "heading",
-                "|",
-                "bold",
-                "italic",
-                "underline",
-                "link",
-                "|",
-                "bulletedList",
-                "numberedList",
-                "|",
-                "blockQuote",
-                "imageUpload",
-                "insertTable",
-                "|",
-                "undo",
-                "redo",
-            ],
-            "shouldNotGroupWhenFull": True,
-        },
-        "language": "ru",
+    'default': {
+        'toolbar': [
+            'heading', '|', 'bold', 'italic', 'underline', 'strikethrough', '|',
+            'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+            'insertTable', 'undo', 'redo'
+        ],
+        'language': 'ru',
     },
-
-    "extends": {
-        "toolbar": {
-            "items": [
-                "heading",
-                "|",
-                "bold",
-                "italic",
-                "underline",
-                "strikethrough",
-                "link",
-                "|",
-                "fontSize",
-                "fontFamily",
-                "fontColor",
-                "fontBackgroundColor",
-                "|",
-                "bulletedList",
-                "numberedList",
-                "todoList",
-                "|",
-                "outdent",
-                "indent",
-                "|",
-                "blockQuote",
-                "insertTable",
-                "imageUpload",
-                "mediaEmbed",
-                "|",
-                "removeFormat",
-                "sourceEditing",
-                "|",
-                "undo",
-                "redo",
-            ],
-            "shouldNotGroupWhenFull": True,
+    'extends': {
+        'toolbar': [
+            'heading', '|', 'bold', 'italic', 'underline', 'strikethrough', '|',
+            'alignment', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+            'insertTable', 'mediaEmbed', 'undo', 'redo'
+        ],
+        'language': 'ru',
+        'table': {
+            'contentToolbar': ['tableColumn', 'tableRow', 'mergeTableCells']
         },
-
-        "image": {
-            "toolbar": [
-                "imageTextAlternative",
-                "|",
-                "imageStyle:alignLeft",
-                "imageStyle:alignCenter",
-                "imageStyle:alignRight",
-                "imageStyle:side",
-            ],
-            "styles": [
-                "full",
-                "side",
-                "alignLeft",
-                "alignCenter",
-                "alignRight",
-            ],
-        },
-
-        "table": {
-            "contentToolbar": [
-                "tableColumn",
-                "tableRow",
-                "mergeTableCells",
-                "tableProperties",
-                "tableCellProperties",
-            ],
-        },
-
-        "heading": {
-            "options": [
-                {
-                    "model": "paragraph",
-                    "title": "Обычный текст",
-                    "class": "ck-heading_paragraph",
-                },
-                {
-                    "model": "heading1",
-                    "view": "h1",
-                    "title": "Заголовок 1",
-                    "class": "ck-heading_heading1",
-                },
-                {
-                    "model": "heading2",
-                    "view": "h2",
-                    "title": "Заголовок 2",
-                    "class": "ck-heading_heading2",
-                },
-                {
-                    "model": "heading3",
-                    "view": "h3",
-                    "title": "Заголовок 3",
-                    "class": "ck-heading_heading3",
-                },
-            ],
-        },
-
-        "language": "ru",
-    },
-}
-
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }

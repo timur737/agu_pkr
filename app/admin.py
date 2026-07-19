@@ -2,12 +2,12 @@ from django.contrib import admin
 from django.db import models
 from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInline
 from .models import AdminPage, PageBlock
-from .widgets import CKEditorTextarea
+from django_ckeditor_5.widgets import CKEditor5Widget
 
 
 class DescriptionCKEditorMixin:
     formfield_overrides = {
-        models.TextField: {'widget': CKEditorTextarea},
+        models.TextField: {'widget': CKEditor5Widget(config_name='extends')},
     }
 
 
