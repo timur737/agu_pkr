@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from modeltranslation.admin import TabbedTranslationAdmin, TranslationTabularInline
-from .models import AdminPage, PageBlock
+from .models import AdminPage, News, PageBlock
 from django_ckeditor_5.widgets import CKEditor5Widget
 
 
@@ -42,4 +42,23 @@ class PageBlockAdmin(DescriptionCKEditorMixin, TabbedTranslationAdmin):
     fieldsets = (
         ('Основное', {'fields': ('page', 'order', 'block_type', 'title', 'description', 'is_active')}),
         ('Медиа, ссылки и значения', {'fields': ('date', 'photo', 'file', 'url', 'value')}),
+    )
+
+
+@admin.register(News)
+class NewsAdmin(DescriptionCKEditorMixin, TabbedTranslationAdmin):
+    list_display = ('order', 'title', 'published_at', 'is_active')
+    list_filter = ('is_active', 'published_at')
+    search_fields = ('title', 'description', 'detail_description', 'slug')
+    list_display_links = ('title',)
+    list_editable = ('order',)
+    prepopulated_fields = {'slug': ('title_ru',)}
+    fieldsets = (
+        ('Карточка в списке новостей', {
+            'fields': ('title', 'slug', 'photo', 'description', 'published_at', 'order', 'is_active'),
+        }),
+        ('Страница выбранной новости', {
+            'fields': ('detail_description', 'detail_photo_1', 'detail_photo_2', 'detail_photo_3'),
+            'description': 'Эти поля отображаются после перехода на выбранную новость.',
+        }),
     )
