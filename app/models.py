@@ -112,3 +112,26 @@ class PageBlock(BaseModel):
     def save(self, *args, **kwargs):
         self.url = normalize_link(self.url)
         super().save(*args, **kwargs)
+
+
+class News(BaseModel):
+    """A news card and the content displayed on its detail page."""
+
+    title = models.CharField(max_length=255, verbose_name="Заголовок")
+    slug = models.SlugField(max_length=160, unique=True, verbose_name="Системный URL")
+    photo = models.ImageField(upload_to='news/cards/', verbose_name="Фото для списка новостей")
+    description = models.TextField(verbose_name="Краткое описание")
+    detail_description = models.TextField(verbose_name="Описание на странице новости")
+    detail_photo_1 = models.ImageField(upload_to='news/details/', verbose_name="Фото новости 1")
+    detail_photo_2 = models.ImageField(upload_to='news/details/', verbose_name="Фото новости 2")
+    detail_photo_3 = models.ImageField(upload_to='news/details/', verbose_name="Фото новости 3")
+    published_at = models.DateTimeField(verbose_name="Дата публикации")
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+
+    class Meta:
+        verbose_name = "Новость"
+        verbose_name_plural = "03. Новости"
+        ordering = ['order', '-published_at', '-id']
+
+    def __str__(self):
+        return self.title

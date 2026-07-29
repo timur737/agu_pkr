@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AdminPage, PageBlock
+from .models import AdminPage, News, PageBlock
 
 
 class PageBlockSerializer(serializers.ModelSerializer):
@@ -67,3 +67,46 @@ class AdminPageSerializer(AdminPageListSerializer):
     def get_subpages(self, obj):
         subpages = obj.subpages.filter(is_active=True).prefetch_related('blocks')
         return AdminPageSerializer(subpages, many=True, context=self.context).data
+
+
+class NewsListSerializer(serializers.ModelSerializer):
+    photo_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = News
+        fields = [
+            'id', 'title', 'slug', 'photo', 'photo_url', 'description',
+            'published_at', 'order', 'created_at', 'updated_at',
+        ]
+
+    def _absolute_url(self, image):
+        if not image:
+            return None
+        request = self.context.get('request')
+        return request.build_absolute_uri(image.url) if request else image.url
+
+    def get_photo_url(self, obj):
+        return self._absolute_url(obj.photo)
+
+
+class NewsSerializer(NewsListSerializer):
+    detail_photo_1_url = serializers.SerializerMethodField()
+    detail_photo_2_url = serializers.SerializerMethodField()
+    detail_photo_3_url = serializers.SerializerMethodField()
+
+    class Meta(NewsListSerializer.Meta):
+        fields = NewsListSerializer.Meta.fields + [
+            'detail_description',
+            'detail_photo_1', 'detail_photo_1_url',
+            'detail_photo_2', 'detail_photo_2_url',
+            'detail_photo_3', 'detail_photo_3_url',
+        ]
+
+    def get_detail_photo_1_url(self, obj):
+        return self._absolute_url(obj.detail_photo_1)
+
+    def get_detail_photo_2_url(self, obj):
+        return self._absolute_url(obj.detail_photo_2)
+
+    def get_detail_photo_3_url(self, obj):
+        return self._absolute_url(obj.detail_photo_3)
