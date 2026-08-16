@@ -3,11 +3,12 @@ from tempfile import TemporaryDirectory
 
 from django.contrib import admin
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import News
+from .admin import AdminPageAdmin, PageBlockInline
+from .models import AdminPage, News, PageBlock
 
 
 def test_image(name):
@@ -91,3 +92,44 @@ class NewsApiTests(TestCase):
 class NewsAdminTests(TestCase):
     def test_news_model_is_available_in_admin(self):
         self.assertIn(News, admin.site._registry)
+
+
+class StructuredContentAdminTests(TestCase):
+    def setUp(self):
+        self.root = AdminPage.objects.create(
+            title='Главная страница', slug='admin-home', group=AdminPage.GROUP_HOME, order=1,
+        )
+        self.child = AdminPage.objects.create(
+            title='Карусель фотографий', slug='admin-slider', group=AdminPage.GROUP_HOME,
+            parent=self.root, order=2,
+        )
+
+    def test_inline_does_not_create_an_implicit_empty_block(self):
+        inline = PageBlockInline(AdminPage, admin.site)
+
+        self.assertEqual(inline.extra, 0)
+
+    def test_blocks_are_only_managed_inside_their_page(self):
+        self.assertNotIn(PageBlock, admin.site._registry)
+        self.assertIn(PageBlockInline, AdminPageAdmin.inlines)
+
+    def test_subpage_is_visually_indented(self):
+        model_admin = AdminPageAdmin(AdminPage, admin.site)
+
+        rendered = str(model_admin.structured_title(self.child))
+
+        self.assertIn('admin-page-depth-1', rendered)
+        self.assertIn('↳', rendered)
+
+    def test_admin_page_query_uses_structure_order(self):
+        model_admin = AdminPageAdmin(AdminPage, admin.site)
+        request = RequestFactory().get('/admin/app/adminpage/')
+
+        pages = model_admin.get_queryset(request).filter(pk__in=(self.root.pk, self.child.pk))
+        self.assertEqual(list(pages), [self.root, self.child])
+
+    def test_block_inline_loads_structure_javascript_and_compact_styles(self):
+        inline = PageBlockInline(AdminPage, admin.site)
+
+        self.assertIn('app/admin/page_blocks.js', inline.media._js)
+        self.assertIn('app/admin/content_structure.css', inline.media._css['all'])

@@ -1,0 +1,38 @@
+/* Keep rich descriptions compact while still allowing them to grow with content. */
+.django-ckeditor-widget,
+.ck-editor {
+  max-width: 100%;
+}
+
+.ck-editor__editable_inline {
+  min-height: 90px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+textarea.ckeditor-textarea {
+  min-height: 90px;
+  max-height: 360px;
+  resize: vertical;
+}
+
+/* Each content block is a separate visual card rather than a wide table row. */
+.inline-group .inline-related {
+  border: 1px solid var(--hairline-color, #ddd);
+  border-radius: 6px;
+  margin: 0 0 16px;
+  overflow: hidden;
+}
+
+.inline-group .inline-related > h3 {
+  padding: 10px 14px;
+}
+
+.admin-page-depth-0 {
+  font-weight: 700;
+}
+
+.admin-page-depth-1 {
+  display: inline-block;
+  padding-left: 24px;
+}
