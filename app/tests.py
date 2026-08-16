@@ -2,6 +2,7 @@ from datetime import timedelta
 from tempfile import TemporaryDirectory
 
 from django.contrib import admin
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, TestCase, override_settings
 from django.utils import timezone
@@ -108,6 +109,9 @@ class StructuredContentAdminTests(TestCase):
         inline = PageBlockInline(AdminPage, admin.site)
 
         self.assertEqual(inline.extra, 0)
+
+    def test_upload_field_limit_supports_translated_page_inlines(self):
+        self.assertGreaterEqual(settings.DATA_UPLOAD_MAX_NUMBER_FIELDS, 10000)
 
     def test_blocks_are_only_managed_inside_their_page(self):
         self.assertNotIn(PageBlock, admin.site._registry)
