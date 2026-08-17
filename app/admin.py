@@ -5,6 +5,8 @@ from django.urls import reverse
 from django.utils.html import format_html
 from modeltranslation.admin import TabbedTranslationAdmin, TranslationStackedInline
 from .models import AdminPage, News, NewsPhoto, PageBlock
+from django.utils.html import format_html
+from modeltranslation.admin import TabbedTranslationAdmin, TranslationStackedInline
 from .widgets import CKEditorTextarea
 
 
