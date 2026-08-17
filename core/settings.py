@@ -26,6 +26,16 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
+# A page is saved together with all of its translated content-block inlines.
+# The home page alone can legitimately exceed Django's default limit of 1,000
+# POST parameters (management form + fields in three languages). Keep a finite
+# limit for request hardening, but make it large enough for the structured admin.
+DATA_UPLOAD_MAX_NUMBER_FIELDS = config(
+    'DATA_UPLOAD_MAX_NUMBER_FIELDS',
+    default=10000,
+    cast=int,
+)
+
 ALLOWED_HOSTS = ['91.213.233.203', 'new.apap.kg', 'localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = ['http://91.213.233.203', 'http://new.apap.kg', 'https://new.apap.kg', 'https://91.213.233.203']

@@ -2,12 +2,14 @@ from datetime import timedelta
 from tempfile import TemporaryDirectory
 
 from django.contrib import admin
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.utils import timezone
 from rest_framework.test import APIClient
 
-from .models import News
+from .admin import AdminPageAdmin, NewsAdminForm, PageBlockInline
+from .models import AdminPage, News, NewsPhoto, PageBlock
 
 
 def test_image(name):
@@ -87,7 +89,96 @@ class NewsApiTests(TestCase):
 
         self.assertEqual([item['slug'] for item in response.json()['results']], ['new-building', older.slug])
 
+    def test_home_news_returns_only_three_selected_items_in_home_order(self):
+        self.news.show_on_home = True
+        self.news.home_order = 2
+        self.news.save()
+        for position in (1, 3):
+            News.objects.create(
+                title=f'Главная {position}', slug=f'home-{position}', photo=test_image(f'home-{position}.gif'),
+                description='Кратко', detail_description='Подробно', published_at=timezone.now(),
+                show_on_home=True, home_order=position,
+            )
+        News.objects.create(
+            title='Только общий список', slug='list-only', photo=test_image('list-only.gif'),
+            description='Кратко', detail_description='Подробно', published_at=timezone.now(),
+        )
+
+        response = self.client.get('/api/news/?on_home=true')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([item['home_order'] for item in response.json()['results']], [1, 2, 3])
+
+    def test_detail_returns_addable_photos(self):
+        NewsPhoto.objects.create(news=self.news, photo=test_image('additional.gif'), order=1)
+
+        response = self.client.get('/api/news/new-building/')
+
+        self.assertEqual(len(response.json()['detail_photos']), 1)
+        self.assertTrue(response.json()['detail_photos'][0]['photo_url'].endswith('additional.gif'))
+
 
 class NewsAdminTests(TestCase):
     def test_news_model_is_available_in_admin(self):
         self.assertIn(News, admin.site._registry)
+
+    def test_home_position_must_be_between_one_and_three(self):
+        form = NewsAdminForm(data={'show_on_home': True, 'home_order': 0})
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('home_order', form.errors)
+
+
+class StructuredContentAdminTests(TestCase):
+    def setUp(self):
+        self.root = AdminPage.objects.create(
+            title='Главная страница', slug='admin-home', group=AdminPage.GROUP_HOME, order=1,
+        )
+        self.child = AdminPage.objects.create(
+            title='Карусель фотографий', slug='admin-slider', group=AdminPage.GROUP_HOME,
+            parent=self.root, order=2,
+        )
+
+    def test_inline_does_not_create_an_implicit_empty_block(self):
+        inline = PageBlockInline(AdminPage, admin.site)
+
+        self.assertEqual(inline.extra, 0)
+
+    def test_upload_field_limit_supports_translated_page_inlines(self):
+        self.assertGreaterEqual(settings.DATA_UPLOAD_MAX_NUMBER_FIELDS, 10000)
+
+    def test_blocks_are_only_managed_inside_their_page(self):
+        self.assertNotIn(PageBlock, admin.site._registry)
+        self.assertIn(PageBlockInline, AdminPageAdmin.inlines)
+
+    def test_subpage_is_visually_indented(self):
+        model_admin = AdminPageAdmin(AdminPage, admin.site)
+
+        rendered = str(model_admin.structured_title(self.child))
+
+        self.assertIn('admin-page-depth-1', rendered)
+        self.assertIn('↳', rendered)
+
+    def test_admin_page_query_uses_structure_order(self):
+        model_admin = AdminPageAdmin(AdminPage, admin.site)
+        request = RequestFactory().get('/admin/app/adminpage/')
+
+        pages = model_admin.get_queryset(request).filter(pk__in=(self.root.pk, self.child.pk))
+        self.assertEqual(list(pages), [self.root, self.child])
+
+    def test_home_page_has_direct_news_subsection_navigation(self):
+        model_admin = AdminPageAdmin(AdminPage, admin.site)
+        request = RequestFactory().get('/admin/app/adminpage/1/change/')
+
+        fieldsets = model_admin.get_fieldsets(request, self.root)
+        navigation = str(model_admin.news_management(self.root))
+
+        self.assertEqual(fieldsets[-1][0], '1.5. Новости')
+        self.assertIn('1.5.1. Новости на главной', navigation)
+        self.assertIn('/admin/app/news/', navigation)
+
+    def test_block_inline_loads_structure_javascript_and_compact_styles(self):
+        inline = PageBlockInline(AdminPage, admin.site)
+
+        self.assertIn('app/admin/page_blocks.js', inline.media._js)
+        self.assertIn('app/admin/content_structure.css', inline.media._css['all'])

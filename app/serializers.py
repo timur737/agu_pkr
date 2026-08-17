@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AdminPage, News, PageBlock
+from .models import AdminPage, News, NewsPhoto, PageBlock
 
 
 class PageBlockSerializer(serializers.ModelSerializer):
@@ -76,8 +76,23 @@ class NewsListSerializer(serializers.ModelSerializer):
         model = News
         fields = [
             'id', 'title', 'slug', 'photo', 'photo_url', 'description',
-            'published_at', 'order', 'created_at', 'updated_at',
+            'published_at', 'order', 'show_on_home', 'home_order',
+            'created_at', 'updated_at',
         ]
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        show_on_home = attrs.get('show_on_home', getattr(self.instance, 'show_on_home', False))
+        home_order = attrs.get('home_order', getattr(self.instance, 'home_order', 0))
+        if show_on_home and home_order not in (1, 2, 3):
+            raise serializers.ValidationError({'home_order': 'Выберите позицию 1, 2 или 3.'})
+        if show_on_home:
+            occupied = News.objects.filter(show_on_home=True, home_order=home_order)
+            if self.instance:
+                occupied = occupied.exclude(pk=self.instance.pk)
+            if occupied.exists():
+                raise serializers.ValidationError({'home_order': 'Эта позиция на главной уже занята.'})
+        return attrs
 
     def _absolute_url(self, image):
         if not image:
@@ -89,10 +104,23 @@ class NewsListSerializer(serializers.ModelSerializer):
         return self._absolute_url(obj.photo)
 
 
+class NewsPhotoSerializer(serializers.ModelSerializer):
+    photo_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = NewsPhoto
+        fields = ['id', 'photo', 'photo_url', 'order']
+
+    def get_photo_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.photo.url) if request else obj.photo.url
+
+
 class NewsSerializer(NewsListSerializer):
     detail_photo_1_url = serializers.SerializerMethodField()
     detail_photo_2_url = serializers.SerializerMethodField()
     detail_photo_3_url = serializers.SerializerMethodField()
+    detail_photos = NewsPhotoSerializer(many=True, read_only=True)
 
     class Meta(NewsListSerializer.Meta):
         fields = NewsListSerializer.Meta.fields + [
@@ -100,6 +128,7 @@ class NewsSerializer(NewsListSerializer):
             'detail_photo_1', 'detail_photo_1_url',
             'detail_photo_2', 'detail_photo_2_url',
             'detail_photo_3', 'detail_photo_3_url',
+            'detail_photos',
         ]
 
     def get_detail_photo_1_url(self, obj):

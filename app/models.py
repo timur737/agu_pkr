@@ -122,11 +122,19 @@ class News(BaseModel):
     photo = models.ImageField(upload_to='news/cards/', verbose_name="Фото для списка новостей")
     description = models.TextField(verbose_name="Краткое описание")
     detail_description = models.TextField(verbose_name="Описание на странице новости")
-    detail_photo_1 = models.ImageField(upload_to='news/details/', verbose_name="Фото новости 1")
-    detail_photo_2 = models.ImageField(upload_to='news/details/', verbose_name="Фото новости 2")
-    detail_photo_3 = models.ImageField(upload_to='news/details/', verbose_name="Фото новости 3")
+    # Kept temporarily for backwards-compatible API responses. New photos are
+    # managed through NewsPhoto blocks below.
+    detail_photo_1 = models.ImageField(upload_to='news/details/', blank=True, null=True, verbose_name="Фото новости 1")
+    detail_photo_2 = models.ImageField(upload_to='news/details/', blank=True, null=True, verbose_name="Фото новости 2")
+    detail_photo_3 = models.ImageField(upload_to='news/details/', blank=True, null=True, verbose_name="Фото новости 3")
     published_at = models.DateTimeField(verbose_name="Дата публикации")
     order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+    show_on_home = models.BooleanField(default=False, verbose_name="Показывать на главной")
+    home_order = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name="Порядок на главной",
+        help_text="Используется только для трех новостей в подразделе 1.5.1.",
+    )
 
     class Meta:
         verbose_name = "Новость"
@@ -135,3 +143,19 @@ class News(BaseModel):
 
     def __str__(self):
         return self.title
+
+
+class NewsPhoto(models.Model):
+    """An addable photo in the content of an individual news page."""
+
+    news = models.ForeignKey(News, related_name='detail_photos', on_delete=models.CASCADE)
+    photo = models.ImageField(upload_to='news/details/', verbose_name="Фотография")
+    order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
+
+    class Meta:
+        verbose_name = "Фотография новости"
+        verbose_name_plural = "Фотографии страницы новости"
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f'{self.news}: {self.order}'

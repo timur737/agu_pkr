@@ -53,7 +53,7 @@ class PageBlockViewSet(LanguageMixin, viewsets.ModelViewSet):
 
 
 class NewsViewSet(LanguageMixin, viewsets.ModelViewSet):
-    queryset = News.objects.filter(is_active=True)
+    queryset = News.objects.filter(is_active=True).prefetch_related('detail_photos')
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description', 'detail_description']
     ordering_fields = ['order', 'published_at', 'created_at']
@@ -64,3 +64,15 @@ class NewsViewSet(LanguageMixin, viewsets.ModelViewSet):
         if self.action == 'list':
             return NewsListSerializer
         return NewsSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.query_params.get('on_home', '').lower() in {'1', 'true', 'yes'}:
+            return queryset.filter(show_on_home=True, home_order__in=(1, 2, 3))
+        return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+        if self.request.query_params.get('on_home', '').lower() in {'1', 'true', 'yes'}:
+            return queryset.order_by('home_order', '-published_at', '-id')
+        return queryset
