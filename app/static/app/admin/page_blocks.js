@@ -1,13 +1,13 @@
 (function () {
   const fieldNames = ['title', 'description', 'date', 'photo', 'file', 'url', 'value'];
   const visibleFields = {
-    text: ['title', 'description'],
-    photo_text: ['title', 'description', 'photo'],
-    link: ['title', 'description', 'url'],
+    text: ['title', 'description', 'file'],
+    photo_text: ['title', 'description', 'photo', 'file'],
+    link: ['title', 'description', 'url', 'file'],
     pdf: ['title', 'description', 'file'],
-    number: ['title', 'description', 'value'],
-    social: ['title', 'url'],
-    slider: ['photo'],
+    number: ['title', 'description', 'value', 'file'],
+    social: ['title', 'url', 'file'],
+    slider: ['photo', 'file'],
   };
 
   function fieldRow(container, name) {

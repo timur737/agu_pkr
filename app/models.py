@@ -53,6 +53,7 @@ class AdminPage(BaseModel):
     parent = models.ForeignKey('self', related_name='subpages', on_delete=models.CASCADE, blank=True, null=True, verbose_name="Родительская страница")
     order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
     main_photo = models.ImageField(upload_to='pages/main/', blank=True, null=True, verbose_name="Главная фотография")
+    content_title = models.CharField(max_length=255, blank=True, verbose_name="Название контента")
     description = models.TextField(blank=True, verbose_name="Описание", help_text="Можно вставлять ссылки через CKEditor. Для редиректа всей страницы используйте поле «Ссылка на редирект».")
     redirect_url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка на редирект")
     pdf_file = models.FileField(upload_to='pages/pdfs/', blank=True, null=True, verbose_name="PDF файл")
@@ -96,7 +97,11 @@ class PageBlock(BaseModel):
     description = models.TextField(blank=True, verbose_name="Описание", help_text="Можно вставлять ссылки через CKEditor. Для блоков AVN/ЭОП и других редиректов используйте отдельное поле «Ссылка» ниже.")
     date = models.DateField(blank=True, null=True, verbose_name="Дата")
     photo = models.ImageField(upload_to='pages/blocks/photos/', blank=True, null=True, verbose_name="Фото")
-    file = models.FileField(upload_to='pages/blocks/files/', blank=True, null=True, verbose_name="PDF файл")
+    file = models.FileField(
+        upload_to='pages/blocks/files/', blank=True, null=True,
+        verbose_name="Прикрепленный файл",
+        help_text="Можно прикрепить файл к блоку любого типа.",
+    )
     url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка", help_text="Заполняйте для блоков типа «Ссылка», например AVN или ЭОП. Ссылка нормализуется автоматически.")
     value = models.CharField(max_length=120, blank=True, verbose_name="Значение / цифра")
     order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
