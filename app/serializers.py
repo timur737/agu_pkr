@@ -9,7 +9,7 @@ class PageBlockSerializer(serializers.ModelSerializer):
     class Meta:
         model = PageBlock
         fields = [
-            'id', 'block_type', 'title', 'description', 'date', 'photo', 'photo_url',
+            'id', 'page', 'block_type', 'title', 'description', 'date', 'photo', 'photo_url',
             'file', 'file_url', 'url', 'value', 'order', 'created_at', 'updated_at'
         ]
 
@@ -35,7 +35,7 @@ class AdminPageListSerializer(serializers.ModelSerializer):
         model = AdminPage
         fields = [
             'id', 'title', 'slug', 'group', 'parent', 'order', 'main_photo',
-            'main_photo_url', 'description', 'redirect_url', 'pdf_file',
+            'main_photo_url', 'content_title', 'description', 'redirect_url', 'pdf_file',
             'is_development', 'created_at', 'updated_at'
         ]
 

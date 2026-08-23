@@ -63,7 +63,7 @@ class AdminPageAdmin(DescriptionCKEditorMixin, TabbedTranslationAdmin):
     inlines = [PageBlockInline]
     fieldsets = (
         ('Структура и навигация', {'fields': ('title', 'slug', 'group', 'parent', 'order', 'is_development', 'is_active')}),
-        ('Контент страницы', {'fields': ('main_photo', 'description', 'redirect_url', 'pdf_file')}),
+        ('Контент страницы', {'fields': ('content_title', 'main_photo', 'description', 'redirect_url', 'pdf_file')}),
     )
 
     @admin.display(description='Страница', ordering='order')

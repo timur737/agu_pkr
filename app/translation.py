@@ -4,7 +4,7 @@ from .models import AdminPage, News, PageBlock
 
 @register(AdminPage)
 class AdminPageTranslationOptions(TranslationOptions):
-    fields = ('title', 'description')
+    fields = ('title', 'content_title', 'description')
 
 
 @register(PageBlock)

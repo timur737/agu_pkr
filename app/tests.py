@@ -182,3 +182,53 @@ class StructuredContentAdminTests(TestCase):
 
         self.assertIn('app/admin/page_blocks.js', inline.media._js)
         self.assertIn('app/admin/content_structure.css', inline.media._css['all'])
+
+    def test_content_title_is_shown_in_page_content_section(self):
+        model_admin = AdminPageAdmin(AdminPage, admin.site)
+        request = RequestFactory().get('/admin/app/adminpage/1/change/')
+
+        fieldsets = model_admin.get_fieldsets(request, self.root)
+
+        for language in ('ru', 'ky', 'en'):
+            self.assertIn(f'content_title_{language}', fieldsets[1][1]['fields'])
+
+
+class PageContentApiTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.media_directory = TemporaryDirectory()
+        cls.media_override = override_settings(MEDIA_ROOT=cls.media_directory.name)
+        cls.media_override.enable()
+        super().setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        cls.media_override.disable()
+        cls.media_directory.cleanup()
+
+    def setUp(self):
+        self.client = APIClient()
+        self.page = AdminPage.objects.create(
+            title='Страница', content_title='Название контента', slug='content-page',
+            group=AdminPage.GROUP_ABOUT,
+        )
+
+    def test_page_detail_returns_content_title(self):
+        response = self.client.get('/api/pages/content-page/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['content_title'], 'Название контента')
+
+    def test_any_block_type_returns_attached_file_for_frontend(self):
+        block = PageBlock.objects.create(
+            page=self.page, block_type=PageBlock.TYPE_TEXT, title='Текстовый блок',
+            file=SimpleUploadedFile('document.txt', b'content', content_type='text/plain'),
+        )
+
+        response = self.client.get(f'/api/page-blocks/{block.pk}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['page'], self.page.pk)
+        self.assertTrue(response.json()['file_url'].startswith('http://testserver/media/'))
+        self.assertTrue(response.json()['file_url'].endswith('document.txt'))
