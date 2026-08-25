@@ -9,8 +9,9 @@ class PageBlockSerializer(serializers.ModelSerializer):
     class Meta:
         model = PageBlock
         fields = [
-            'id', 'page', 'block_type', 'title', 'description', 'date', 'photo', 'photo_url',
-            'file', 'file_url', 'url', 'value', 'order', 'created_at', 'updated_at'
+            'id', 'page', 'block_type', 'title', 'description', 'short_information',
+            'contacts', 'email', 'date', 'photo', 'photo_url', 'file', 'file_url',
+            'url', 'value', 'order', 'created_at', 'updated_at'
         ]
 
     def _absolute_url(self, file_field):

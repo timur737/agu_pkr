@@ -1,8 +1,14 @@
 (function () {
-  const fieldNames = ['title', 'description', 'date', 'photo', 'file', 'url', 'value'];
+  const fieldNames = [
+    'title', 'description', 'short_information', 'contacts', 'email',
+    'date', 'photo', 'file', 'url', 'value',
+  ];
   const visibleFields = {
     text: ['title', 'description', 'file'],
-    photo_text: ['title', 'description', 'photo', 'file'],
+    photo_text: [
+      'title', 'description', 'short_information', 'contacts', 'email',
+      'photo', 'file', 'url',
+    ],
     link: ['title', 'description', 'url', 'file'],
     pdf: ['title', 'description', 'file'],
     number: ['title', 'description', 'value', 'file'],
