@@ -9,7 +9,7 @@ class AdminPageTranslationOptions(TranslationOptions):
 
 @register(PageBlock)
 class PageBlockTranslationOptions(TranslationOptions):
-    fields = ('title', 'description', 'value')
+    fields = ('title', 'description', 'short_information', 'contacts', 'value')
 
 
 @register(News)

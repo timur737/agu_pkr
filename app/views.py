@@ -42,7 +42,7 @@ class PageBlockViewSet(LanguageMixin, viewsets.ModelViewSet):
     serializer_class = PageBlockSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = PageBlockFilter
-    search_fields = ['title', 'description', 'url', 'value']
+    search_fields = ['title', 'description', 'short_information', 'contacts', 'email', 'url', 'value']
     ordering_fields = ['order', 'created_at']
     ordering = ['page__order', 'order', 'id']
 

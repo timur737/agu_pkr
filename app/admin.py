@@ -44,7 +44,10 @@ class PageBlockInline(DescriptionCKEditorMixin, TranslationStackedInline):
     # Empty inline forms used to be submitted as a block with order=0.  Blocks
     # must only be created after the editor explicitly presses "Add another".
     extra = 0
-    fields = ('order', 'block_type', 'title', 'description', 'date', 'photo', 'file', 'url', 'value', 'is_active')
+    fields = (
+        'order', 'block_type', 'title', 'description', 'short_information',
+        'contacts', 'email', 'date', 'photo', 'file', 'url', 'value', 'is_active',
+    )
 
     class Media:
         css = {'all': ('app/admin/content_structure.css',)}

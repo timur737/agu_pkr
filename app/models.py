@@ -95,6 +95,9 @@ class PageBlock(BaseModel):
     block_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default=TYPE_TEXT, verbose_name="Тип блока")
     title = models.CharField(max_length=255, blank=True, verbose_name="Название / текст ссылки")
     description = models.TextField(blank=True, verbose_name="Описание", help_text="Можно вставлять ссылки через CKEditor. Для блоков AVN/ЭОП и других редиректов используйте отдельное поле «Ссылка» ниже.")
+    short_information = models.TextField(blank=True, verbose_name="Краткая информация")
+    contacts = models.CharField(max_length=500, blank=True, verbose_name="Контакты")
+    email = models.EmailField(blank=True, verbose_name="Электронная почта")
     date = models.DateField(blank=True, null=True, verbose_name="Дата")
     photo = models.ImageField(upload_to='pages/blocks/photos/', blank=True, null=True, verbose_name="Фото")
     file = models.FileField(
@@ -102,7 +105,7 @@ class PageBlock(BaseModel):
         verbose_name="Прикрепленный файл",
         help_text="Можно прикрепить файл к блоку любого типа.",
     )
-    url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка", help_text="Заполняйте для блоков типа «Ссылка», например AVN или ЭОП. Ссылка нормализуется автоматически.")
+    url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка / сайт партнера", help_text="Заполняйте для блоков типа «Ссылка», AVN/ЭОП и блоков партнеров. Ссылка нормализуется автоматически.")
     value = models.CharField(max_length=120, blank=True, verbose_name="Значение / цифра")
     order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
 

@@ -232,3 +232,22 @@ class PageContentApiTests(TestCase):
         self.assertEqual(response.json()['page'], self.page.pk)
         self.assertTrue(response.json()['file_url'].startswith('http://testserver/media/'))
         self.assertTrue(response.json()['file_url'].endswith('document.txt'))
+
+    def test_person_card_fields_and_partner_link_are_returned_by_api(self):
+        block = PageBlock.objects.create(
+            page=self.page,
+            block_type=PageBlock.TYPE_PHOTO_TEXT,
+            title='Почетный профессор',
+            short_information='Доктор наук',
+            contacts='+996 555 123 456',
+            email='professor@example.com',
+            url='partner.example.com',
+        )
+
+        response = self.client.get(f'/api/page-blocks/{block.pk}/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['short_information'], 'Доктор наук')
+        self.assertEqual(response.json()['contacts'], '+996 555 123 456')
+        self.assertEqual(response.json()['email'], 'professor@example.com')
+        self.assertEqual(response.json()['url'], 'https://partner.example.com')
