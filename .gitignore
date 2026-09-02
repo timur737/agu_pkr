@@ -8,3 +8,6 @@ GEMINI.md
 
 # Secrets
 .env
+
+# Runtime Let's Encrypt certificates and ACME challenge files
+certbot/
