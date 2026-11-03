@@ -1,19 +1,19 @@
 (function () {
   const fieldNames = [
     'title', 'description', 'short_information', 'contacts', 'email',
-    'date', 'image_ru', 'image_ky', 'image_en', 'file', 'url', 'value',
+    'date', 'image_ru', 'image_ky', 'image_en', 'file_ru', 'file_ky', 'file_en', 'url', 'value',
   ];
   const visibleFields = {
-    text: ['title', 'description', 'file'],
+    text: ['title', 'description', 'file_ru', 'file_ky', 'file_en'],
     photo_text: [
       'title', 'description', 'short_information', 'contacts', 'email',
-      'image_ru', 'image_ky', 'image_en', 'file', 'url',
+      'image_ru', 'image_ky', 'image_en', 'file_ru', 'file_ky', 'file_en', 'url',
     ],
-    link: ['title', 'description', 'url', 'file'],
-    pdf: ['title', 'description', 'file'],
-    number: ['title', 'description', 'value', 'file'],
-    social: ['title', 'url', 'file'],
-    slider: ['image_ru', 'image_ky', 'image_en', 'file'],
+    link: ['title', 'description', 'url', 'file_ru', 'file_ky', 'file_en'],
+    pdf: ['title', 'description', 'file_ru', 'file_ky', 'file_en'],
+    number: ['title', 'description', 'value', 'file_ru', 'file_ky', 'file_en'],
+    social: ['title', 'url', 'file_ru', 'file_ky', 'file_en'],
+    slider: ['image_ru', 'image_ky', 'image_en', 'file_ru', 'file_ky', 'file_en'],
   };
 
   function fieldRow(container, name) {

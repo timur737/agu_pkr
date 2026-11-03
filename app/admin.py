@@ -46,7 +46,8 @@ class PageBlockInline(DescriptionCKEditorMixin, TranslationStackedInline):
     extra = 0
     fields = (
         'order', 'block_type', 'title', 'description', 'short_information',
-        'contacts', 'email', 'date', 'image_ru', 'image_ky', 'image_en', 'file', 'url', 'value', 'is_active',
+        'contacts', 'email', 'date', 'image_ru', 'image_ky', 'image_en',
+        'file_ru', 'file_ky', 'file_en', 'url', 'value', 'is_active',
     )
 
     class Media:
@@ -66,7 +67,7 @@ class AdminPageAdmin(DescriptionCKEditorMixin, TabbedTranslationAdmin):
     inlines = [PageBlockInline]
     fieldsets = (
         ('Структура и навигация', {'fields': ('title', 'slug', 'group', 'parent', 'order', 'is_development', 'is_active')}),
-        ('Контент страницы', {'fields': ('content_title', 'image_ru', 'image_ky', 'image_en', 'description', 'redirect_url', 'pdf_file')}),
+        ('Контент страницы', {'fields': ('content_title', 'image_ru', 'image_ky', 'image_en', 'description', 'redirect_url', 'file_ru', 'file_ky', 'file_en')}),
     )
 
     @admin.display(description='Страница', ordering='order')

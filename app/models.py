@@ -58,7 +58,9 @@ class AdminPage(BaseModel):
     content_title = models.CharField(max_length=255, blank=True, verbose_name="Название контента")
     description = models.TextField(blank=True, verbose_name="Описание", help_text="Можно вставлять ссылки через CKEditor. Для редиректа всей страницы используйте поле «Ссылка на редирект».")
     redirect_url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка на редирект")
-    pdf_file = models.FileField(upload_to='pages/pdfs/', blank=True, null=True, verbose_name="PDF файл")
+    file_ru = models.FileField(upload_to='pages/pdfs/', blank=True, null=True, verbose_name="Файл (русский)")
+    file_ky = models.FileField(upload_to='pages/pdfs/', blank=True, null=True, verbose_name="Файл (кыргызский)")
+    file_en = models.FileField(upload_to='pages/pdfs/', blank=True, null=True, verbose_name="Файл (английский)")
     is_development = models.BooleanField(default=False, verbose_name="В разработке")
 
     class Meta:
@@ -104,11 +106,9 @@ class PageBlock(BaseModel):
     image_ru = models.ImageField(upload_to='pages/blocks/photos/', blank=True, null=True, verbose_name="Фото (русский)")
     image_ky = models.ImageField(upload_to='pages/blocks/photos/', blank=True, null=True, verbose_name="Фото (кыргызский)")
     image_en = models.ImageField(upload_to='pages/blocks/photos/', blank=True, null=True, verbose_name="Фото (английский)")
-    file = models.FileField(
-        upload_to='pages/blocks/files/', blank=True, null=True,
-        verbose_name="Прикрепленный файл",
-        help_text="Можно прикрепить файл к блоку любого типа.",
-    )
+    file_ru = models.FileField(upload_to='pages/blocks/files/', blank=True, null=True, verbose_name="Файл (русский)")
+    file_ky = models.FileField(upload_to='pages/blocks/files/', blank=True, null=True, verbose_name="Файл (кыргызский)")
+    file_en = models.FileField(upload_to='pages/blocks/files/', blank=True, null=True, verbose_name="Файл (английский)")
     url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка / сайт партнера", help_text="Заполняйте для блоков типа «Ссылка», AVN/ЭОП и блоков партнеров. Ссылка нормализуется автоматически.")
     value = models.CharField(max_length=120, blank=True, verbose_name="Значение / цифра")
     order = models.PositiveIntegerField(default=0, verbose_name="Порядок")

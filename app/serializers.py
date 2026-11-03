@@ -3,13 +3,12 @@ from .models import AdminPage, News, NewsPhoto, PageBlock
 
 
 class PageBlockSerializer(serializers.ModelSerializer):
-    file_url = serializers.SerializerMethodField()
-
     class Meta:
         model = PageBlock
         fields = [
             'id', 'page', 'block_type', 'title', 'description', 'short_information',
-            'contacts', 'email', 'date', 'image_ru', 'image_ky', 'image_en', 'file', 'file_url',
+            'contacts', 'email', 'date', 'image_ru', 'image_ky', 'image_en',
+            'file_ru', 'file_ky', 'file_en',
             'url', 'value', 'order', 'created_at', 'updated_at'
         ]
 
@@ -21,16 +20,12 @@ class PageBlockSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(file_field.url)
         return file_field.url
 
-    def get_file_url(self, obj):
-        return self._absolute_url(obj.file)
-
-
 class AdminPageListSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminPage
         fields = [
             'id', 'title', 'slug', 'group', 'parent', 'order', 'image_ru', 'image_ky', 'image_en',
-            'content_title', 'description', 'redirect_url', 'pdf_file',
+            'content_title', 'description', 'redirect_url', 'file_ru', 'file_ky', 'file_en',
             'is_development', 'created_at', 'updated_at'
         ]
 
@@ -38,18 +33,9 @@ class AdminPageListSerializer(serializers.ModelSerializer):
 class AdminPageSerializer(AdminPageListSerializer):
     blocks = PageBlockSerializer(many=True, read_only=True)
     subpages = serializers.SerializerMethodField()
-    pdf_file_url = serializers.SerializerMethodField()
 
     class Meta(AdminPageListSerializer.Meta):
-        fields = AdminPageListSerializer.Meta.fields + ['pdf_file_url', 'blocks', 'subpages']
-
-    def get_pdf_file_url(self, obj):
-        if not obj.pdf_file:
-            return None
-        request = self.context.get('request')
-        if request:
-            return request.build_absolute_uri(obj.pdf_file.url)
-        return obj.pdf_file.url
+        fields = AdminPageListSerializer.Meta.fields + ['blocks', 'subpages']
 
     def get_subpages(self, obj):
         subpages = obj.subpages.filter(is_active=True).prefetch_related('blocks')
