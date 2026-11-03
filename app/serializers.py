@@ -3,14 +3,13 @@ from .models import AdminPage, News, NewsPhoto, PageBlock
 
 
 class PageBlockSerializer(serializers.ModelSerializer):
-    photo_url = serializers.SerializerMethodField()
     file_url = serializers.SerializerMethodField()
 
     class Meta:
         model = PageBlock
         fields = [
             'id', 'page', 'block_type', 'title', 'description', 'short_information',
-            'contacts', 'email', 'date', 'photo', 'photo_url', 'file', 'file_url',
+            'contacts', 'email', 'date', 'image_ru', 'image_ky', 'image_en', 'file', 'file_url',
             'url', 'value', 'order', 'created_at', 'updated_at'
         ]
 
@@ -22,31 +21,18 @@ class PageBlockSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(file_field.url)
         return file_field.url
 
-    def get_photo_url(self, obj):
-        return self._absolute_url(obj.photo)
-
     def get_file_url(self, obj):
         return self._absolute_url(obj.file)
 
 
 class AdminPageListSerializer(serializers.ModelSerializer):
-    main_photo_url = serializers.SerializerMethodField()
-
     class Meta:
         model = AdminPage
         fields = [
-            'id', 'title', 'slug', 'group', 'parent', 'order', 'main_photo',
-            'main_photo_url', 'content_title', 'description', 'redirect_url', 'pdf_file',
+            'id', 'title', 'slug', 'group', 'parent', 'order', 'image_ru', 'image_ky', 'image_en',
+            'content_title', 'description', 'redirect_url', 'pdf_file',
             'is_development', 'created_at', 'updated_at'
         ]
-
-    def get_main_photo_url(self, obj):
-        if not obj.main_photo:
-            return None
-        request = self.context.get('request')
-        if request:
-            return request.build_absolute_uri(obj.main_photo.url)
-        return obj.main_photo.url
 
 
 class AdminPageSerializer(AdminPageListSerializer):
@@ -71,12 +57,10 @@ class AdminPageSerializer(AdminPageListSerializer):
 
 
 class NewsListSerializer(serializers.ModelSerializer):
-    photo_url = serializers.SerializerMethodField()
-
     class Meta:
         model = News
         fields = [
-            'id', 'title', 'slug', 'photo', 'photo_url', 'description',
+            'id', 'title', 'slug', 'image_ru', 'image_ky', 'image_en', 'description',
             'published_at', 'order', 'show_on_home', 'home_order',
             'created_at', 'updated_at',
         ]
@@ -95,48 +79,19 @@ class NewsListSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({'home_order': 'Эта позиция на главной уже занята.'})
         return attrs
 
-    def _absolute_url(self, image):
-        if not image:
-            return None
-        request = self.context.get('request')
-        return request.build_absolute_uri(image.url) if request else image.url
-
-    def get_photo_url(self, obj):
-        return self._absolute_url(obj.photo)
-
-
 class NewsPhotoSerializer(serializers.ModelSerializer):
-    photo_url = serializers.SerializerMethodField()
 
     class Meta:
         model = NewsPhoto
-        fields = ['id', 'photo', 'photo_url', 'order']
-
-    def get_photo_url(self, obj):
-        request = self.context.get('request')
-        return request.build_absolute_uri(obj.photo.url) if request else obj.photo.url
+        fields = ['id', 'image_ru', 'image_ky', 'image_en', 'order']
 
 
 class NewsSerializer(NewsListSerializer):
-    detail_photo_1_url = serializers.SerializerMethodField()
-    detail_photo_2_url = serializers.SerializerMethodField()
-    detail_photo_3_url = serializers.SerializerMethodField()
     detail_photos = NewsPhotoSerializer(many=True, read_only=True)
 
     class Meta(NewsListSerializer.Meta):
         fields = NewsListSerializer.Meta.fields + [
             'detail_description',
-            'detail_photo_1', 'detail_photo_1_url',
-            'detail_photo_2', 'detail_photo_2_url',
-            'detail_photo_3', 'detail_photo_3_url',
             'detail_photos',
         ]
 
-    def get_detail_photo_1_url(self, obj):
-        return self._absolute_url(obj.detail_photo_1)
-
-    def get_detail_photo_2_url(self, obj):
-        return self._absolute_url(obj.detail_photo_2)
-
-    def get_detail_photo_3_url(self, obj):
-        return self._absolute_url(obj.detail_photo_3)

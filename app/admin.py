@@ -46,7 +46,7 @@ class PageBlockInline(DescriptionCKEditorMixin, TranslationStackedInline):
     extra = 0
     fields = (
         'order', 'block_type', 'title', 'description', 'short_information',
-        'contacts', 'email', 'date', 'photo', 'file', 'url', 'value', 'is_active',
+        'contacts', 'email', 'date', 'image_ru', 'image_ky', 'image_en', 'file', 'url', 'value', 'is_active',
     )
 
     class Media:
@@ -66,7 +66,7 @@ class AdminPageAdmin(DescriptionCKEditorMixin, TabbedTranslationAdmin):
     inlines = [PageBlockInline]
     fieldsets = (
         ('Структура и навигация', {'fields': ('title', 'slug', 'group', 'parent', 'order', 'is_development', 'is_active')}),
-        ('Контент страницы', {'fields': ('content_title', 'main_photo', 'description', 'redirect_url', 'pdf_file')}),
+        ('Контент страницы', {'fields': ('content_title', 'image_ru', 'image_ky', 'image_en', 'description', 'redirect_url', 'pdf_file')}),
     )
 
     @admin.display(description='Страница', ordering='order')
@@ -117,7 +117,7 @@ class NewsAdmin(DescriptionCKEditorMixin, TabbedTranslationAdmin):
             'description': 'Отметьте новость для главной страницы и задайте позицию от 1 до 3.',
         }),
         ('1.5.2. Новости — общая страница', {
-            'fields': ('title', 'slug', 'photo', 'description', 'published_at', 'order', 'is_active'),
+            'fields': ('title', 'slug', 'image_ru', 'image_ky', 'image_en', 'description', 'published_at', 'order', 'is_active'),
         }),
         ('1.5.3. Страница выбранной новости', {
             'fields': ('detail_description',),
@@ -128,6 +128,6 @@ class NewsAdmin(DescriptionCKEditorMixin, TabbedTranslationAdmin):
     class NewsPhotoInline(admin.TabularInline):
         model = NewsPhoto
         extra = 0
-        fields = ('order', 'photo')
+        fields = ('order', 'image_ru', 'image_ky', 'image_en')
 
     inlines = (NewsPhotoInline,)

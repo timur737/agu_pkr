@@ -40,12 +40,9 @@ class NewsApiTests(TestCase):
         self.news = News.objects.create(
             title='Открытие нового корпуса',
             slug='new-building',
-            photo=test_image('card.gif'),
+            image_ru=test_image('card.gif'),
             description='Краткое описание новости',
             detail_description='Полный текст новости',
-            detail_photo_1=test_image('detail-1.gif'),
-            detail_photo_2=test_image('detail-2.gif'),
-            detail_photo_3=test_image('detail-3.gif'),
             published_at=timezone.now(),
         )
 
@@ -55,9 +52,9 @@ class NewsApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         item = response.json()['results'][0]
         self.assertEqual(item['title'], self.news.title)
-        self.assertIn('photo_url', item)
+        self.assertIn('image_ru', item)
         self.assertNotIn('detail_description', item)
-        self.assertNotIn('detail_photo_1', item)
+        self.assertNotIn('detail_photos', item)
 
     def test_news_detail_returns_description_and_three_photos(self):
         response = self.client.get('/api/news/new-building/')
@@ -65,8 +62,7 @@ class NewsApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data['detail_description'], 'Полный текст новости')
-        for number in range(1, 4):
-            self.assertTrue(data[f'detail_photo_{number}_url'].startswith('http://testserver/media/'))
+        self.assertEqual(data['detail_photos'], [])
 
     def test_inactive_news_is_not_public(self):
         self.news.is_active = False
@@ -78,10 +74,9 @@ class NewsApiTests(TestCase):
 
     def test_news_are_ordered_by_admin_order_then_publication_date(self):
         older = News.objects.create(
-            title='Более старая новость', slug='older', photo=test_image('older.gif'),
+            title='Более старая новость', slug='older', image_ru=test_image('older.gif'),
             description='Кратко', detail_description='Подробно',
-            detail_photo_1=test_image('older-1.gif'), detail_photo_2=test_image('older-2.gif'),
-            detail_photo_3=test_image('older-3.gif'), published_at=timezone.now() - timedelta(days=1),
+            published_at=timezone.now() - timedelta(days=1),
             order=1,
         )
 
@@ -95,12 +90,12 @@ class NewsApiTests(TestCase):
         self.news.save()
         for position in (1, 3):
             News.objects.create(
-                title=f'Главная {position}', slug=f'home-{position}', photo=test_image(f'home-{position}.gif'),
+                title=f'Главная {position}', slug=f'home-{position}', image_ru=test_image(f'home-{position}.gif'),
                 description='Кратко', detail_description='Подробно', published_at=timezone.now(),
                 show_on_home=True, home_order=position,
             )
         News.objects.create(
-            title='Только общий список', slug='list-only', photo=test_image('list-only.gif'),
+            title='Только общий список', slug='list-only', image_ru=test_image('list-only.gif'),
             description='Кратко', detail_description='Подробно', published_at=timezone.now(),
         )
 
@@ -110,12 +105,12 @@ class NewsApiTests(TestCase):
         self.assertEqual([item['home_order'] for item in response.json()['results']], [1, 2, 3])
 
     def test_detail_returns_addable_photos(self):
-        NewsPhoto.objects.create(news=self.news, photo=test_image('additional.gif'), order=1)
+        NewsPhoto.objects.create(news=self.news, image_ru=test_image('additional.gif'), order=1)
 
         response = self.client.get('/api/news/new-building/')
 
         self.assertEqual(len(response.json()['detail_photos']), 1)
-        self.assertTrue(response.json()['detail_photos'][0]['photo_url'].endswith('additional.gif'))
+        self.assertTrue(response.json()['detail_photos'][0]['image_ru'].endswith('additional.gif'))
 
 
 class NewsAdminTests(TestCase):

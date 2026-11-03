@@ -52,7 +52,9 @@ class AdminPage(BaseModel):
     group = models.CharField(max_length=40, choices=GROUP_CHOICES, verbose_name="Главная страница раздела")
     parent = models.ForeignKey('self', related_name='subpages', on_delete=models.CASCADE, blank=True, null=True, verbose_name="Родительская страница")
     order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
-    main_photo = models.ImageField(upload_to='pages/main/', blank=True, null=True, verbose_name="Главная фотография")
+    image_ru = models.ImageField(upload_to='pages/main/', blank=True, null=True, verbose_name="Главное фото (русский)")
+    image_ky = models.ImageField(upload_to='pages/main/', blank=True, null=True, verbose_name="Главное фото (кыргызский)")
+    image_en = models.ImageField(upload_to='pages/main/', blank=True, null=True, verbose_name="Главное фото (английский)")
     content_title = models.CharField(max_length=255, blank=True, verbose_name="Название контента")
     description = models.TextField(blank=True, verbose_name="Описание", help_text="Можно вставлять ссылки через CKEditor. Для редиректа всей страницы используйте поле «Ссылка на редирект».")
     redirect_url = models.CharField(max_length=500, blank=True, verbose_name="Ссылка на редирект")
@@ -99,7 +101,9 @@ class PageBlock(BaseModel):
     contacts = models.CharField(max_length=500, blank=True, verbose_name="Контакты")
     email = models.EmailField(blank=True, verbose_name="Электронная почта")
     date = models.DateField(blank=True, null=True, verbose_name="Дата")
-    photo = models.ImageField(upload_to='pages/blocks/photos/', blank=True, null=True, verbose_name="Фото")
+    image_ru = models.ImageField(upload_to='pages/blocks/photos/', blank=True, null=True, verbose_name="Фото (русский)")
+    image_ky = models.ImageField(upload_to='pages/blocks/photos/', blank=True, null=True, verbose_name="Фото (кыргызский)")
+    image_en = models.ImageField(upload_to='pages/blocks/photos/', blank=True, null=True, verbose_name="Фото (английский)")
     file = models.FileField(
         upload_to='pages/blocks/files/', blank=True, null=True,
         verbose_name="Прикрепленный файл",
@@ -127,14 +131,13 @@ class News(BaseModel):
 
     title = models.CharField(max_length=255, verbose_name="Заголовок")
     slug = models.SlugField(max_length=160, unique=True, verbose_name="Системный URL")
-    photo = models.ImageField(upload_to='news/cards/', verbose_name="Фото для списка новостей")
+    image_ru = models.ImageField(upload_to='news/cards/', blank=True, null=True, verbose_name="Фото (русский)")
+    image_ky = models.ImageField(upload_to='news/cards/', blank=True, null=True, verbose_name="Фото (кыргызский)")
+    image_en = models.ImageField(upload_to='news/cards/', blank=True, null=True, verbose_name="Фото (английский)")
     description = models.TextField(verbose_name="Краткое описание")
     detail_description = models.TextField(verbose_name="Описание на странице новости")
     # Kept temporarily for backwards-compatible API responses. New photos are
     # managed through NewsPhoto blocks below.
-    detail_photo_1 = models.ImageField(upload_to='news/details/', blank=True, null=True, verbose_name="Фото новости 1")
-    detail_photo_2 = models.ImageField(upload_to='news/details/', blank=True, null=True, verbose_name="Фото новости 2")
-    detail_photo_3 = models.ImageField(upload_to='news/details/', blank=True, null=True, verbose_name="Фото новости 3")
     published_at = models.DateTimeField(verbose_name="Дата публикации")
     order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
     show_on_home = models.BooleanField(default=False, verbose_name="Показывать на главной")
@@ -157,7 +160,9 @@ class NewsPhoto(models.Model):
     """An addable photo in the content of an individual news page."""
 
     news = models.ForeignKey(News, related_name='detail_photos', on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to='news/details/', verbose_name="Фотография")
+    image_ru = models.ImageField(upload_to='news/details/', blank=True, null=True, verbose_name="Фото (русский)")
+    image_ky = models.ImageField(upload_to='news/details/', blank=True, null=True, verbose_name="Фото (кыргызский)")
+    image_en = models.ImageField(upload_to='news/details/', blank=True, null=True, verbose_name="Фото (английский)")
     order = models.PositiveIntegerField(default=0, verbose_name="Порядок")
 
     class Meta:
